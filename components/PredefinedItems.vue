@@ -1,6 +1,9 @@
 <template>
   <div class="container mx-auto max-w-2xl">
-    <div v-if="groupedItems && Object.keys(groupedItems).length > 0">
+    <div v-if="isLoading">
+      <p class="text-center text-gray-500 py-4">Ürünler Yükleniyor...</p>
+    </div>
+    <div v-else-if="groupedItems && Object.keys(groupedItems).length > 0">
       <div
         v-for="(items, category) in groupedItems"
         :key="category"
@@ -25,7 +28,7 @@
       </div>
     </div>
     <div v-else>
-      <p>Loading...</p>
+      <p class="text-center text-gray-500 py-4">Hiç ürün bulunamadı.</p>
     </div>
   </div>
 </template>
@@ -34,11 +37,11 @@
 import type { PredefinedItem } from "@/types";
 
 // Composable'dan veri çek
-const { predefinedItems, fetchItems, isLoading, errorMessage } =
+const { predefinedItems, fetchPredefinedItems, isLoading, errorMessage } =
   useFetchPredefinedItems();
 
 // Başlangıçta verileri çek
-fetchItems();
+fetchPredefinedItems();
 
 const groupedItems = computed(() => {
   return predefinedItems.value.reduce(

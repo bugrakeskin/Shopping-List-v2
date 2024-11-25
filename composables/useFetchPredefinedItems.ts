@@ -5,7 +5,7 @@ export const useFetchPredefinedItems = () => {
   const isLoading = ref(true);
   const errorMessage = ref<string | null>(null);
 
-  const fetchItems = async () => {
+  const fetchPredefinedItems = async () => {
     isLoading.value = true;
     errorMessage.value = null;
 
@@ -28,5 +28,5 @@ export const useFetchPredefinedItems = () => {
     }
   };
 
-  return { predefinedItems, fetchItems, isLoading, errorMessage };
+  return { predefinedItems, fetchPredefinedItems, isLoading, errorMessage };
 };
