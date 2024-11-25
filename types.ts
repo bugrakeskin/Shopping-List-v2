@@ -11,3 +11,10 @@ export type ShoppingListItem = {
   item_id: string; // PredefinedItem'den foreign key
   created_at: string; // ISO tarih formatı
 };
+
+export type PurchaseHistory = {
+  id: string; // UUID
+  item_id: string; // PredefinedItem'den foreign key
+  created_at: string; // ISO tarih formatı
+  purchase_date: string; // ISO tarih formatı
+};
