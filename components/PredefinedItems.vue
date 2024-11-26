@@ -8,41 +8,48 @@
       class="text-gray-600 dark:text-gray-300"
     >
       <!-- Header -->
-      <div class="flex items-center justify-between mb-4">
-        <p class="font-semibold text-xl">Ürünler</p>
+      <div class="flex items-center justify-between mb-6">
+        <div class="grid">
+          <UIcon
+            size="40px"
+            name="material-symbols:grocery-sharp"
+            class="text-green-600 dark:text-green-600"
+          />
+          <span class="text-xs pl-0.5">Ürünler</span>
+        </div>
+
         <UButton
+          color="green"
+          class="leading-8"
           @click="openModal"
           variant="outline"
-          q
           size="xs"
           icon="i-heroicons-plus"
         >
           Ürün Ekle
         </UButton>
       </div>
-      <!-- Grouped Items -->
+      <!-- Grouped Catergory Items -->
       <div
         v-for="(items, category) in groupedItems"
         :key="category"
         class="mb-2"
       >
-        <!-- Category -->
-        <div
-          class="flex items-center mb-1 justify-between dark:text-gray-00 text-gray-400"
-        >
-          <!-- Left Side -->
-          <div class="flex space-x-1">
-            <UIcon
-              size="15px"
-              :name="getIconType(category)"
-              class="text-green-600 dark:text-green-300"
-            />
-            <span class="leading-none">{{ category }}</span>
+        <UDivider>
+          <div
+            class="mb-2 text-sm md:text-lg justify-between dark:text-gray-500 text-gray-400 font-light"
+          >
+            <div class="flex space-x-1">
+              <UIcon
+                :name="getIconType(category)"
+                class="text-green-600 dark:text-green-600"
+              />
+              <span class="leading-none">
+                {{ category }} ({{ items.length }})
+              </span>
+            </div>
           </div>
-
-          <!-- Right Side -->
-          <span class="text-xs">{{ items.length }} ürün</span>
-        </div>
+        </UDivider>
 
         <!-- item list -->
         <div
@@ -58,16 +65,14 @@
           <div class="flex">
             <UButton
               size="xl"
-              class="text-green-600 dark:text-green-300 bg-transparent border-0 p-0 mr-3"
-              color="white"
-              variant="ghost"
+              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1 mr-3"
+              variant="soft"
               icon="solar:cart-plus-outline"
             />
             <UButton
               size="xl"
-              class="text-red-500 dark:text-red-300 border-0 p-0"
-              color="white"
-              variant="ghost"
+              class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1"
+              variant="soft"
               icon="solar:trash-bin-minimalistic-outline"
             />
           </div>
