@@ -2,23 +2,19 @@
 <template>
   <div
     v-if="isOpen"
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80"
+    class="fixed inset-0 flex items-center justify-center bg-gray-900 dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-80"
   >
-    <UCard class="sm:w-80 md:w-96 text-black p-4 rounded shadow-lg">
-      <!-- <h2 class="text-xl mb-4">Ürün Ekle</h2> -->
+    <UCard class="sm:w-80 md:w-96 rounded shadow-lg">
+      <div class="flex justify-between items-start mb-4">
+        <p class="font-semibold text-xl">Ürün Ekleyin</p>
+        <UIcon
+          name="solar:close-circle-outline"
+          class="bg-red-500 hover:bg-black dark:bg-red-300 dark:hover:bg-white text-2xl"
+          @click="closeModal"
+        />
+      </div>
       <!-- Modal içeriği buraya gelecek -->
       <div>
-        <div class="flex justify-between items-start">
-          <h1 class="text-xl mb-4 text-green-600 dark:text-green-300">
-            Ürün Ekleyin
-          </h1>
-          <UIcon
-            name="i-heroicons-x-mark"
-            class="text-gray-600 dark:text-gray-300 text-xl"
-            @click="closeModal"
-          />
-        </div>
-
         <UForm class="space-y-4" @submit.prevent="" :state="{}">
           <UFormGroup label="Ürün Adı" name="product">
             <UInput v-model="def" />

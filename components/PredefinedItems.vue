@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-2xl p-4">
+  <div class="container mx-auto max-w-xl p-4">
     <div v-if="isLoading">
       <p class="text-center text-gray-500 py-2">Ürünler Yükleniyor...</p>
     </div>
@@ -13,6 +13,7 @@
         <UButton
           @click="openModal"
           variant="outline"
+          q
           size="xs"
           icon="i-heroicons-plus"
         >
@@ -47,23 +48,23 @@
         <div
           v-for="item in items"
           :key="item.id"
-          class="py-1 pl-2 flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer"
+          class="py-1 pl-2 flex items-center justify-between cursor-pointer"
         >
           <!-- left side -->
           <div>
-            <span>{{ item.name }}</span>
+            <span class="leading-none text-lg md:text-md">{{ item.name }}</span>
           </div>
           <!-- right side -->
           <div class="flex">
             <UButton
-              size="lg"
-              class="text-green-600 dark:text-green-300 bg-transparent border-0 p-0 mr-1"
+              size="xl"
+              class="text-green-600 dark:text-green-300 bg-transparent border-0 p-0 mr-3"
               color="white"
               variant="ghost"
               icon="solar:cart-plus-outline"
             />
             <UButton
-              size="lg"
+              size="xl"
               class="text-red-500 dark:text-red-300 border-0 p-0"
               color="white"
               variant="ghost"
