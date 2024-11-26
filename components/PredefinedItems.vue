@@ -7,6 +7,7 @@
       v-else-if="groupedItems && Object.keys(groupedItems).length > 0"
       class="text-gray-600 dark:text-gray-300"
     >
+      <!-- Header -->
       <div class="flex items-center justify-between mb-4">
         <p class="font-semibold text-xl">Ürünler</p>
         <UButton
@@ -18,6 +19,7 @@
           Ürün Ekle
         </UButton>
       </div>
+      <!-- Grouped Items -->
       <div
         v-for="(items, category) in groupedItems"
         :key="category"
@@ -25,10 +27,10 @@
       >
         <!-- Category -->
         <div
-          class="w-full flex items-center mb-1 justify-between dark:text-gray-00 text-gray-400"
+          class="flex items-center mb-1 justify-between dark:text-gray-00 text-gray-400"
         >
           <!-- Left Side -->
-          <div class="flex items-end space-x-1">
+          <div class="flex space-x-1">
             <UIcon
               size="15px"
               :name="getIconType(category)"
@@ -38,34 +40,35 @@
           </div>
 
           <!-- Right Side -->
-          <span class="flex-shrink-0 text-sm">{{ items.length }} ürün</span>
+          <span class="text-xs">{{ items.length }} ürün</span>
         </div>
-        <div>
-          <!-- item list -->
-          <div
-            v-for="item in items"
-            :key="item.id"
-            class="py-1 pl-2 flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer"
-          >
-            <!-- left side -->
-            <div>
-              <span>{{ item.name }}</span>
-            </div>
-            <!-- right side -->
-            <div class="flex">
-              <UButton
-                class="text-green-600 dark:text-green-300 bg-transparent border-0 p-0"
-                color="white"
-                variant="ghost"
-                icon="solar:cart-plus-outline"
-              />
-              <UButton
-                class="text-red-500 dark:text-red-300"
-                color="white"
-                variant="ghost"
-                icon="solar:trash-bin-minimalistic-outline"
-              />
-            </div>
+
+        <!-- item list -->
+        <div
+          v-for="item in items"
+          :key="item.id"
+          class="py-1 pl-2 flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer"
+        >
+          <!-- left side -->
+          <div>
+            <span>{{ item.name }}</span>
+          </div>
+          <!-- right side -->
+          <div class="flex">
+            <UButton
+              size="lg"
+              class="text-green-600 dark:text-green-300 bg-transparent border-0 p-0 mr-1"
+              color="white"
+              variant="ghost"
+              icon="solar:cart-plus-outline"
+            />
+            <UButton
+              size="lg"
+              class="text-red-500 dark:text-red-300 border-0 p-0"
+              color="white"
+              variant="ghost"
+              icon="solar:trash-bin-minimalistic-outline"
+            />
           </div>
         </div>
       </div>
