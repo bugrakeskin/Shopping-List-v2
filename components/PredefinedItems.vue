@@ -8,8 +8,13 @@
       class="text-gray-600 dark:text-gray-300"
     >
       <div class="flex items-center justify-between mb-4">
-        <p class="font-semibold text-xl">Ürün listesi</p>
-        <UButton variant="outline" size="sm" icon="i-heroicons-plus">
+        <p class="font-semibold text-xl">Ürünler</p>
+        <UButton
+          @click="openModal"
+          variant="outline"
+          size="xs"
+          icon="i-heroicons-plus"
+        >
           Ürün Ekle
         </UButton>
       </div>
@@ -18,42 +23,46 @@
         :key="category"
         class="mb-2"
       >
+        <!-- Category -->
         <div
-          class="group w-full flex mb-1 justify-between items-center text-xs dark:text-gray-300 text-gray-400"
+          class="w-full flex items-center mb-1 justify-between dark:text-gray-00 text-gray-400"
         >
-          <div>
-            <UIcon name="solar:cart-large-outline" class="mr-1" />
-            <span> {{ category }} </span>
+          <!-- Left Side -->
+          <div class="flex items-end space-x-1">
+            <UIcon
+              size="15px"
+              :name="getIconType(category)"
+              class="text-green-600 dark:text-green-300"
+            />
+            <span class="leading-none">{{ category }}</span>
           </div>
 
-          <span>{{ items.length }} ürün</span>
+          <!-- Right Side -->
+          <span class="flex-shrink-0 text-sm">{{ items.length }} ürün</span>
         </div>
         <div>
+          <!-- item list -->
           <div
             v-for="item in items"
             :key="item.id"
-            class="py-1 flex items-center justify-between"
+            class="py-1 pl-2 flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer"
           >
             <!-- left side -->
             <div>
-              <UIcon
-                name="i-heroicons-shopping-bag"
-                class="mr-2 text-green-600 dark:text-green-300"
-              />
               <span>{{ item.name }}</span>
             </div>
             <!-- right side -->
-            <div class="flex space-x-1">
+            <div class="flex">
               <UButton
-                class="text-green-600 dark:text-green-300"
+                class="text-green-600 dark:text-green-300 bg-transparent border-0 p-0"
                 color="white"
-                variant="solid"
+                variant="ghost"
                 icon="solar:cart-plus-outline"
               />
               <UButton
                 class="text-red-500 dark:text-red-300"
                 color="white"
-                variant="solid"
+                variant="ghost"
                 icon="solar:trash-bin-minimalistic-outline"
               />
             </div>
@@ -64,19 +73,19 @@
     <div v-else>
       <p class="text-center text-gray-500 py-4">Hiç ürün bulunamadı.</p>
     </div>
+    <!-- main div -->
   </div>
-  <!-- main div -->
+  <AddPredefinedItemsModal :isOpen="isModalOpen" @close="closeModal" />
 </template>
 
 <script lang="ts" setup>
+import type { _padding } from "#tailwind-config/theme";
+import { _sm } from "#tailwind-config/theme/typography";
 import type { PredefinedItem } from "@/types";
 
 // Composable'dan veri çek
 const { predefinedItems, fetchPredefinedItems, isLoading, errorMessage } =
   useFetchPredefinedItems();
-
-// Başlangıçta verileri çek
-/* fetchPredefinedItems(); */
 
 const groupedItems = computed(() => {
   if (!predefinedItems.value || predefinedItems.value.length === 0) {
@@ -99,6 +108,13 @@ const groupedItems = computed(() => {
     {}
   );
 });
+const isModalOpen = ref(false);
+const openModal = () => {
+  isModalOpen.value = true;
+};
+const closeModal = () => {
+  isModalOpen.value = false;
+};
 onMounted(() => {
   fetchPredefinedItems(); // Bileşen DOM'a eklendiğinde veriyi çek
 });
