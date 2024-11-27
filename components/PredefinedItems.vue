@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-xl p-4">
+  <div class="container mx-auto max-w-xl">
     <div v-if="isLoading">
       <p class="text-center text-gray-500 py-2">Ürünler Yükleniyor...</p>
     </div>
@@ -15,15 +15,16 @@
             name="material-symbols:grocery-sharp"
             class="text-green-600 dark:text-green-600"
           />
-          <span class="text-xs pl-0.5">Ürünler</span>
+          <span class="text-xs font-light pl-0.5">Ürünler</span>
         </div>
 
         <UButton
+          square
           color="green"
-          class="leading-8"
+          class=""
           @click="openModal"
           variant="outline"
-          size="xs"
+          size="sm"
           icon="i-heroicons-plus"
         >
           Ürün Ekle
@@ -36,18 +37,12 @@
         class="mb-2"
       >
         <UDivider>
-          <div
-            class="mb-2 text-sm md:text-lg justify-between dark:text-gray-500 text-gray-400 font-light"
-          >
-            <div class="flex space-x-1">
-              <UIcon
-                :name="getIconType(category)"
-                class="text-green-600 dark:text-green-600"
-              />
-              <span class="leading-none">
-                {{ category }} ({{ items.length }})
-              </span>
-            </div>
+          <div class="font-extralight text-sm flex items-end text-gray-400 dark:text-gray-600">
+            <UIcon
+              :name="getIconType(category)"
+              class="mr-1 text-lg"
+            />
+            <span class="leading-none">{{ category }} ({{ items.length }})</span>
           </div>
         </UDivider>
 
@@ -84,7 +79,10 @@
     </div>
     <!-- main div -->
   </div>
-  <AddPredefinedItemsModal :isOpen="isModalOpen" @close="closeModal" />
+  <AddPredefinedItemsModal
+    :isOpen="isModalOpen"
+    @close="closeModal"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -93,29 +91,25 @@ import { _sm } from "#tailwind-config/theme/typography";
 import type { PredefinedItem } from "@/types";
 
 // Composable'dan veri çek
-const { predefinedItems, fetchPredefinedItems, isLoading, errorMessage } =
-  useFetchPredefinedItems();
+const { predefinedItems, fetchPredefinedItems, isLoading, errorMessage } = useFetchPredefinedItems();
 
 const groupedItems = computed(() => {
   if (!predefinedItems.value || predefinedItems.value.length === 0) {
     return {};
   }
 
-  return predefinedItems.value.reduce(
-    (groups: Record<string, PredefinedItem[]>, item) => {
-      if (!item.category) {
-        console.warn("Kategori alanı eksik olan ürün:", item);
-        return groups; // Kategorisi olmayan ürünü atla
-      }
+  return predefinedItems.value.reduce((groups: Record<string, PredefinedItem[]>, item) => {
+    if (!item.category) {
+      console.warn("Kategori alanı eksik olan ürün:", item);
+      return groups; // Kategorisi olmayan ürünü atla
+    }
 
-      if (!groups[item.category]) {
-        groups[item.category] = [];
-      }
-      groups[item.category].push(item);
-      return groups;
-    },
-    {}
-  );
+    if (!groups[item.category]) {
+      groups[item.category] = [];
+    }
+    groups[item.category].push(item);
+    return groups;
+  }, {});
 });
 const isModalOpen = ref(false);
 const openModal = () => {
