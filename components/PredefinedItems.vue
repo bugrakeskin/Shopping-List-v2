@@ -85,8 +85,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { _padding } from "#tailwind-config/theme";
-import { _sm } from "#tailwind-config/theme/typography";
 import type { PredefinedItem } from "@/types";
 
 // Composable'dan veri çek
