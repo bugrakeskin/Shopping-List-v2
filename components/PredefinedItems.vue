@@ -28,7 +28,7 @@
     <UCard v-else-if="groupedItems && Object.keys(groupedItems).length > 0">
       <!-- Header -->
       <div class="flex items-start justify-between mb-6">
-        <div class="grid">
+        <div class="flex items-center space-x-2">
           <UIcon
             size="30px"
             name="material-symbols:grocery-sharp"

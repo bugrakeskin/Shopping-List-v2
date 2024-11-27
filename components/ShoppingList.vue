@@ -31,14 +31,14 @@
     </div>
     <!-- Items Loaded State -->
     <UCard v-else>
-      <div class="flex items-start justify-between mb-4">
-        <div class="grid justify-start items-start -m-1">
+      <div class="flex items-start justify-between mb-6">
+        <div class="flex items-center">
           <UIcon
             size="30px"
             name="material-symbols:check-box-outline-rounded"
-            class="text-green-600 dark:text-green-600 p-0"
+            class="text-green-600 dark:text-green-600"
           />
-          <span class="text-xs font-light ml-1">Liste</span>
+          <span class="text-xs font-light ml-1">Alışveriş Listesi</span>
         </div>
       </div>
       <!-- show items list -->
@@ -54,12 +54,13 @@
           :label="item.predefined_items.name"
         />
 
-        <div class="flex items-center space-x-1 md:space-x-4">
+        <div class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 rounded-xl px-2 py-1 space-x-1 md:space-x-2">
+          <span class="text-xs font-light leading-none">{{ item.formattedDate }}</span>
+          <!-- Dinamik İkon -->
           <UIcon
-            name="fluent:food-48-regular"
-            class="bg-gray-500 dark:bg-gray-300 text-xl"
+            :name="getIconType(item.predefined_items.category)"
+            class="text-lg"
           />
-          <span class="text-xs font-light leading-none text-gray-400 dark:text-gray-600">{{ item.formattedDate }}</span>
         </div>
       </div>
     </UCard>
@@ -85,4 +86,3 @@ onMounted(async () => {
   }));
 });
 </script>
-<style></style>
