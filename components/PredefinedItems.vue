@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto max-w-xl">
     <div v-if="isLoading">
-      <UCard class="space-y-4 p-4">
+      <UCard class="space-y-4 p-2">
         <!-- Header skeleton -->
         <div class="flex items-start justify-between mb-6">
           <div class="grid space-y-2">
@@ -33,7 +33,7 @@
       <div class="flex items-start justify-between mb-6">
         <div class="grid">
           <UIcon
-            size="40px"
+            size="30px"
             name="material-symbols:grocery-sharp"
             class="text-green-600 dark:text-green-600"
           />
@@ -71,7 +71,7 @@
         <div
           v-for="item in items"
           :key="item.id"
-          class="py-1 pl-2 flex items-center justify-between cursor-pointer"
+          class="pl-2 flex items-center justify-between cursor-pointer"
         >
           <!-- left side -->
           <div>
@@ -81,13 +81,13 @@
           <div class="flex">
             <UButton
               size="xl"
-              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1 mr-3"
+              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 mr-3"
               variant="soft"
               icon="solar:cart-plus-outline"
             />
             <UButton
               size="xl"
-              class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1"
+              class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-0"
               variant="soft"
               icon="solar:trash-bin-minimalistic-outline"
             />
@@ -96,7 +96,7 @@
       </div>
     </UCard>
     <div v-else>
-      <p class="text-center text-gray-500 py-4">Hiç ürün bulunamadı.</p>
+      <p class="text-center text-gray-500 py-2">Hiç ürün bulunamadı.</p>
     </div>
     <!-- main div -->
   </div>
