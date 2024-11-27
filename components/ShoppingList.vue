@@ -55,7 +55,7 @@
         />
 
         <div class="flex items-center space-x-2">
-          <span class="text-sm font-thin text-gray-500">
+          <span class="text-sm font-thin leading-none text-gray-400 dark:text-gray-600">
             {{ item.formattedDate }}
           </span>
           <UIcon

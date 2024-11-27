@@ -25,10 +25,7 @@
         </div>
       </UCard>
     </div>
-    <UCard
-      v-else-if="groupedItems && Object.keys(groupedItems).length > 0"
-      class="text-gray-600 dark:text-gray-300"
-    >
+    <UCard v-else-if="groupedItems && Object.keys(groupedItems).length > 0">
       <!-- Header -->
       <div class="flex items-start justify-between mb-6">
         <div class="grid">
