@@ -8,7 +8,7 @@
       class="text-gray-600 dark:text-gray-300"
     >
       <!-- Header -->
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-start justify-between mb-6">
         <div class="grid">
           <UIcon
             size="40px"
@@ -20,12 +20,11 @@
 
         <UButton
           square
-          color="green"
-          class=""
+          color="gray"
           @click="openModal"
-          variant="outline"
-          size="sm"
-          icon="i-heroicons-plus"
+          variant="solid"
+          size="xs"
+          icon="material-symbols:list-alt-add-outline-rounded"
         >
           Ürün Ekle
         </UButton>

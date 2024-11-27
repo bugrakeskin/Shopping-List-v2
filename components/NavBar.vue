@@ -1,18 +1,18 @@
 <template>
   <nav class="container mx-auto max-w-xl mb-2">
-    <div class="w-full flex justify-center mb-4">
+    <div class="w-full flex justify-center mb-4 rounded-xl">
       <UButtonGroup class="w-full flex items-center justify-center">
         <UButton
           class="flex-1 flex items-center justify-center"
           icon="material-symbols:list-alt-check-outline-rounded"
-          color="lime"
+          color="gray"
           variant="solid"
           label="Shopping List"
         />
         <UButton
           class="flex-1 flex items-center justify-center"
           icon="ic:round-history"
-          color="lime"
+          color="gray"
           variant="solid"
           label="Geçmiş"
         />
