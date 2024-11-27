@@ -37,7 +37,7 @@
             name="material-symbols:grocery-sharp"
             class="text-green-600 dark:text-green-600"
           />
-          <span class="text-xs font-light pl-0.5">Ürünler</span>
+          <span class="text-xs font-light">Ürünler</span>
         </div>
 
         <UButton
@@ -81,7 +81,7 @@
           <div class="flex">
             <UButton
               size="xl"
-              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 mr-3"
+              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0"
               variant="soft"
               icon="solar:cart-plus-outline"
             />

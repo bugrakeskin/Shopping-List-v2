@@ -54,13 +54,13 @@
           :label="item.predefined_items.name"
         />
 
-        <div class="flex items-center space-x-2 text-xl">
-          <span class="text-sm text-gray-500">
+        <div class="flex items-center space-x-2">
+          <span class="text-sm font-thin text-gray-500">
             {{ item.formattedDate }}
           </span>
           <UIcon
             name="fluent:food-48-regular"
-            class="bg-green-500 dark:bg-green-300"
+            class="bg-green-500 dark:bg-green-300 text-xl"
           />
         </div>
       </div>
