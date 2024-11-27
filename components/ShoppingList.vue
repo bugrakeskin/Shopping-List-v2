@@ -48,20 +48,18 @@
         class="px-2 py-2 flex items-center justify-between cursor-pointer"
       >
         <UCheckbox
-          class="scale-125"
+          class="scale-110"
           v-model="selected"
           name="notifications"
           :label="item.predefined_items.name"
         />
 
-        <div class="flex items-center space-x-2">
-          <span class="text-sm font-thin leading-none text-gray-400 dark:text-gray-600">
-            {{ item.formattedDate }}
-          </span>
+        <div class="flex items-center space-x-1 md:space-x-4">
           <UIcon
             name="fluent:food-48-regular"
-            class="bg-green-500 dark:bg-green-300 text-xl"
+            class="bg-gray-500 dark:bg-gray-300 text-xl"
           />
+          <span class="text-xs font-light leading-none text-gray-400 dark:text-gray-600">{{ item.formattedDate }}</span>
         </div>
       </div>
     </UCard>

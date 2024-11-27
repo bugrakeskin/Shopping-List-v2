@@ -7,7 +7,7 @@
           icon="material-symbols:list-alt-check-outline-rounded"
           color="gray"
           variant="solid"
-          label="Shopping List"
+          label="Ana Sayfa"
         />
         <UButton
           class="flex-1 flex items-center justify-center"

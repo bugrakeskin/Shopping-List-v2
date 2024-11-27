@@ -72,7 +72,7 @@
         >
           <!-- left side -->
           <div>
-            <span class="leading-none text-lg md:text-md">{{ item.name }}</span>
+            <span class="leading-none text-md md:text-md">{{ item.name }}</span>
           </div>
           <!-- right side -->
           <div class="flex">
