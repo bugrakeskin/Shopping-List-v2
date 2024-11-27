@@ -1,7 +1,29 @@
 <template>
   <div class="container mx-auto max-w-xl">
     <div v-if="isLoading">
-      <p class="text-center text-gray-500 py-2">Ürünler Yükleniyor...</p>
+      <UCard class="space-y-4 p-4">
+        <!-- Header skeleton -->
+        <div class="flex items-start justify-between mb-6">
+          <div class="grid space-y-2">
+            <USkeleton class="h-10 w-10 rounded-full" />
+            <USkeleton class="h-4 w-16" />
+          </div>
+          <USkeleton class="h-8 w-24 rounded" />
+        </div>
+
+        <!-- List item skeletons -->
+        <div class="space-y-3">
+          <div
+            v-for="i in 3"
+            :key="i"
+            class="flex items-center justify-between"
+          >
+            <USkeleton class="h-6 w-6 rounded-full" />
+            <USkeleton class="h-4 w-[70%]" />
+            <USkeleton class="h-4 w-12" />
+          </div>
+        </div>
+      </UCard>
     </div>
     <UCard
       v-else-if="groupedItems && Object.keys(groupedItems).length > 0"

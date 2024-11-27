@@ -10,10 +10,11 @@ export type ShoppingListItem = {
   predefined_items: {
     name: string;
     category: string;
-    item_id: string; // UUID veya başka bir tür olabilir
   };
+  item_id: string; // UUID veya başka bir tür olabilir
   id: string; // PredefinedItem'den foreign key
   created_at: string; // ISO tarih formatı
+  formattedDate: string;
 };
 
 export type PurchaseHistory = {
