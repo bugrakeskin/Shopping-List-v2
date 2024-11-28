@@ -1,16 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-xl">
-    <div class="flex items-start justify-between mb-2">
-      <div class="flex items-center">
-        <UIcon
-          size="30px"
-          name="material-symbols:grocery-sharp"
-          class="text-green-600 dark:text-green-600"
-        />
-        <span class="text-xl font-light ml-1">Ürünler</span>
-      </div>
-    </div>
-
+  <div class="container mx-auto max-w-xl gap-4 grid">
     <div v-if="isLoading">
       <UCard class="space-y-4 p-2">
         <!-- Header skeleton -->
@@ -38,34 +27,70 @@
     </div>
     <UCard v-else-if="groupedItems && Object.keys(groupedItems).length > 0">
       <!-- Header -->
-      <div class="flex items-start justify-end mb-6">
-        <UButton
-          square
-          color="gray"
-          @click="openModal"
-          variant="solid"
-          size="xs"
-          icon="material-symbols:list-alt-add-outline-rounded"
-        >
-          Ürün Ekle
-        </UButton>
+      <!--   <UDivider :ui="{ border: { base: 'border-gray-100 dark:border-gray-600' } }">
+        <div class="flex items-center justify-center space-x-1 mb-4">
+          <UIcon
+            size="30px"
+            name="material-symbols:grocery-sharp"
+            class="text-green-600 dark:text-green-600"
+          />
+          <span class="text-xl font-light">Ürünler</span>
+        </div>
+      </UDivider> -->
+      <!--   <div class="flex items-center space-x-1 mb-4">
+        <div>
+          <UIcon
+            size="25px"
+            name="material-symbols:grocery-sharp"
+            class="text-green-600 dark:text-green-600"
+          />
+        </div>
+        <div>
+          <span class="text-lg leading-none font-light">Ürünler</span>
+        </div>
+      </div> -->
+
+      <div>
+        <span class="inline-flex items-baseline mb-2">
+          <UIcon
+            name="material-symbols:grocery-sharp"
+            class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600"
+          />
+          <span class="text-xl font-thin">Ürünler</span>
+        </span>
       </div>
+
       <!-- Grouped Catergory Items -->
       <div
         v-for="(items, category) in groupedItems"
         :key="category"
-        class="mb-2"
+        class="mb-1"
       >
-        <UDivider>
-          <div class="font-extralight text-sm flex items-end text-gray-400 dark:text-gray-600">
+        <UDivider class="pl-2" :ui="{ border: { base: 'border-gray-200 dark:border-gray-800' } }">
+          <div class="font-extralight text-sm flex items-end text-gray-400 dark:text-gray-700">
+           <!--  <UIcon
+              :name="getIconType(category)"
+              class="self-center  w-5 h-5  "
+            /> -->
+            <span class="self-center">{{ category }} ({{ items.length }})</span>
+          <!--   <span class="inline-flex items-baseline ">
             <UIcon
               :name="getIconType(category)"
-              class="mr-1 text-lg"
+              class="self-center rounded-full w-4 h-5  "
             />
-            <span class="leading-none">{{ category }} ({{ items.length }})</span>
+            <span class="text-sm text-gray-400 dark:text-gray-600 font-light mr-1 w-16">{{ category }}</span>
+          </span> -->
           </div>
         </UDivider>
-
+     <!--    <div>
+          <span class="inline-flex items-baseline ">
+            <UIcon
+              :name="getIconType(category)"
+              class="self-center w-4 h-5 rounded-full mr-1 text-green-600 dark:text-green-600"
+            />
+            <span class="text-sm text-gray-400 dark:text-gray-600 font-light mr-1 w-16">{{ category }}</span>
+          </span>
+        </div> -->
         <!-- item list -->
         <div
           v-for="item in items"
@@ -80,18 +105,31 @@
           <div class="flex">
             <UButton
               size="xl"
-              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0"
+              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1"
               variant="soft"
               icon="solar:cart-plus-outline"
             />
             <UButton
               size="xl"
-              class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-0"
+              class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1"
               variant="soft"
               icon="solar:trash-bin-minimalistic-outline"
             />
           </div>
         </div>
+      </div>
+      <div class="flex items-start justify-end mb-6">
+        <UButton
+          block
+          square
+          color="gray"
+          @click="openModal"
+          variant="solid"
+          size="xs"
+          icon="material-symbols:list-alt-add-outline-rounded"
+        >
+          Ürün Ekle
+        </UButton>
       </div>
     </UCard>
     <div v-else>

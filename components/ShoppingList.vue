@@ -1,16 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-xl mb-4">
-    <div class="flex items-start justify-between mb-2 -ml-0.5">
-      <div class="flex items-center">
-        <UIcon
-          size="30px"
-          name="material-symbols:check-box-outline-rounded"
-          class="text-green-600 dark:text-green-600"
-        />
-        <span class="text-xl font-light ml-1">Alışveriş Listesi</span>
-      </div>
-    </div>
-
+  <div class="container mx-auto max-w-xl mb-4 gap-4 grid">
     <!-- Loading State -->
     <div v-if="isLoading">
       <UCard class="space-y-4 p-4">
@@ -42,35 +31,46 @@
     </div>
     <!-- Items Loaded State -->
     <UCard v-else>
-      <!--   <div class="flex items-start justify-between mb-6">
-        <div class="flex items-center">
+      <!-- Header -->
+      <!--     <UDivider :ui="{ border: { base: 'border-gray-100 dark:border-gray-600' } }">
+      <div class="flex items-center justify-center space-x-1">
+        <UIcon
+          size="30px"
+          name="material-symbols:check-box-outline-rounded"
+          class="text-green-600 dark:text-green-600"
+        />
+        <span class="text-xl font-light">Alışveriş Listesi</span>
+      </div>
+    </UDivider> -->
+
+      <div>
+        <span class="inline-flex items-baseline mb-2">
           <UIcon
-            size="30px"
-            name="material-symbols:check-box-outline-rounded"
-            class="text-green-600 dark:text-green-600"
+            name="material-symbols:check-box-outline"
+            class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600"
           />
-          <span class="text-sm font-light ml-1">Alışveriş Listesi</span>
-        </div>
-      </div> -->
+          <span class="text-xl font-thin">Liste</span>
+        </span>
+      </div>
+
       <!-- show items list -->
       <div
         v-for="item in items"
         :key="item.id"
-        class="px-2 py-2 flex items-center justify-between cursor-pointer"
+        class="px-2 py-1 flex items-center justify-between cursor-pointer"
       >
         <UCheckbox
-          class="scale-110"
+          class="scale-100"
           v-model="selected"
           name="notifications"
           :label="item.predefined_items.name"
         />
 
-        <div class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 rounded-xl px-2 py-1 space-x-1 md:space-x-2">
+        <div class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 rounded-xl px-1 py-1 space-x-1 md:space-x-2">
           <span class="text-xs font-light leading-none">{{ item.formattedDate }}</span>
-          <!-- Dinamik İkon -->
           <UIcon
             :name="getIconType(item.predefined_items.category)"
-            class="text-lg"
+            class=""
           />
         </div>
       </div>
@@ -79,6 +79,7 @@
 </template>
 
 <script lang="ts" setup>
+import { Base } from "#build/components";
 import type { ShoppingListItem } from "@/types";
 
 const items = ref<ShoppingListItem[]>([]);
