@@ -1,5 +1,16 @@
 <template>
   <div class="container mx-auto max-w-xl mb-4">
+    <div class="flex items-start justify-between mb-2 -ml-0.5">
+      <div class="flex items-center">
+        <UIcon
+          size="30px"
+          name="material-symbols:check-box-outline-rounded"
+          class="text-green-600 dark:text-green-600"
+        />
+        <span class="text-xl font-light ml-1">Alışveriş Listesi</span>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div v-if="isLoading">
       <UCard class="space-y-4 p-4">
@@ -31,16 +42,16 @@
     </div>
     <!-- Items Loaded State -->
     <UCard v-else>
-      <div class="flex items-start justify-between mb-6">
+      <!--   <div class="flex items-start justify-between mb-6">
         <div class="flex items-center">
           <UIcon
             size="30px"
             name="material-symbols:check-box-outline-rounded"
             class="text-green-600 dark:text-green-600"
           />
-          <span class="text-xs font-light ml-1">Alışveriş Listesi</span>
+          <span class="text-sm font-light ml-1">Alışveriş Listesi</span>
         </div>
-      </div>
+      </div> -->
       <!-- show items list -->
       <div
         v-for="item in items"

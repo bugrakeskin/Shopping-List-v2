@@ -1,5 +1,16 @@
 <template>
   <div class="container mx-auto max-w-xl">
+    <div class="flex items-start justify-between mb-2">
+      <div class="flex items-center">
+        <UIcon
+          size="30px"
+          name="material-symbols:grocery-sharp"
+          class="text-green-600 dark:text-green-600"
+        />
+        <span class="text-xl font-light ml-1">Ürünler</span>
+      </div>
+    </div>
+
     <div v-if="isLoading">
       <UCard class="space-y-4 p-2">
         <!-- Header skeleton -->
@@ -27,16 +38,7 @@
     </div>
     <UCard v-else-if="groupedItems && Object.keys(groupedItems).length > 0">
       <!-- Header -->
-      <div class="flex items-start justify-between mb-6">
-        <div class="flex items-center space-x-2">
-          <UIcon
-            size="30px"
-            name="material-symbols:grocery-sharp"
-            class="text-green-600 dark:text-green-600"
-          />
-          <span class="text-xs font-light">Ürünler</span>
-        </div>
-
+      <div class="flex items-start justify-end mb-6">
         <UButton
           square
           color="gray"
