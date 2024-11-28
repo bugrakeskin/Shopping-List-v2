@@ -57,7 +57,7 @@
       <div
         v-for="item in items"
         :key="item.id"
-        class="px-2 py-1 flex items-center justify-between cursor-pointer"
+        class="pl-2 py-1 flex items-center justify-between cursor-pointer"
       >
         <UCheckbox
           class="scale-100"
@@ -66,8 +66,8 @@
           :label="item.predefined_items.name"
         />
 
-        <div class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 rounded-xl px-1 py-1 space-x-1 md:space-x-2">
-          <span class="text-xs font-light leading-none">{{ item.formattedDate }}</span>
+        <div class="flex text-gray-500 dark:text-gray-300 items-center  px-2 py-1 space-x-1 md:space-x-2">
+          <span class="text-xs font-light">{{ item.formattedDate }}</span>
           <UIcon
             :name="getIconType(item.predefined_items.category)"
             class=""

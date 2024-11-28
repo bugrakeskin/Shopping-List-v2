@@ -64,9 +64,9 @@
       <div
         v-for="(items, category) in groupedItems"
         :key="category"
-        class="mb-1"
+        class=""
       >
-        <UDivider class="pl-2" :ui="{ border: { base: 'border-gray-200 dark:border-gray-800' } }">
+        <UDivider class="pl-2 " :ui="{ border: { base: 'border-gray-200 dark:border-gray-800' } }">
           <div class="font-extralight text-sm flex items-end text-gray-400 dark:text-gray-700">
            <!--  <UIcon
               :name="getIconType(category)"
@@ -82,15 +82,7 @@
           </span> -->
           </div>
         </UDivider>
-     <!--    <div>
-          <span class="inline-flex items-baseline ">
-            <UIcon
-              :name="getIconType(category)"
-              class="self-center w-4 h-5 rounded-full mr-1 text-green-600 dark:text-green-600"
-            />
-            <span class="text-sm text-gray-400 dark:text-gray-600 font-light mr-1 w-16">{{ category }}</span>
-          </span>
-        </div> -->
+   
         <!-- item list -->
         <div
           v-for="item in items"
@@ -102,23 +94,23 @@
             <span class="leading-none text-md md:text-md">{{ item.name }}</span>
           </div>
           <!-- right side -->
-          <div class="flex">
+          <div class="flex ">
             <UButton
               size="xl"
-              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1"
+              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1 "
               variant="soft"
               icon="solar:cart-plus-outline"
             />
             <UButton
               size="xl"
-              class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1"
+              class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1 "
               variant="soft"
               icon="solar:trash-bin-minimalistic-outline"
             />
           </div>
         </div>
       </div>
-      <div class="flex items-start justify-end mb-6">
+      <div class="flex items-start justify-end mt-4">
         <UButton
           block
           square
