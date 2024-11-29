@@ -25,24 +25,15 @@
         </div>
       </UCard>
     </div>
+
     <!-- No Items State -->
     <div v-else-if="items.length === 0">
       <p class="text-center text-gray-500 py-4">Hiç ürün bulunamadı.</p>
     </div>
+
     <!-- Items Loaded State -->
     <UCard v-else>
       <!-- Header -->
-      <!--     <UDivider :ui="{ border: { base: 'border-gray-100 dark:border-gray-600' } }">
-      <div class="flex items-center justify-center space-x-1">
-        <UIcon
-          size="30px"
-          name="material-symbols:check-box-outline-rounded"
-          class="text-green-600 dark:text-green-600"
-        />
-        <span class="text-xl font-light">Alışveriş Listesi</span>
-      </div>
-    </UDivider> -->
-
       <div>
         <span class="inline-flex items-baseline mb-2">
           <UIcon
@@ -53,7 +44,7 @@
         </span>
       </div>
 
-      <!-- show items list -->
+      <!-- Show items list -->
       <div
         v-for="item in items"
         :key="item.id"
@@ -62,14 +53,14 @@
         <UCheckbox
           class="scale-100"
           v-model="selected"
+          :value="item.id"
           name="notifications"
-          :label="item.predefined_items.name"
+          :label="item.predefined_items?.name || 'Bilinmeyen Ürün'"
         />
-
-        <div class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 rounded-xl px-2 py-1 space-x-1 md:space-x-2">
-          <span class="text-xs font-light">{{ item.formattedDate }}</span>
+        <div class="flex text-gray-500 dark:text-gray-300 items-center px-2 py-1 space-x-1 md:space-x-2">
+          <span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
           <UIcon
-            :name="getIconType(item.predefined_items.category)"
+            :name="getIconType(item.predefined_items?.category || 'default-category')"
             class=""
           />
         </div>
@@ -79,22 +70,31 @@
 </template>
 
 <script lang="ts" setup>
-import { Base } from "#build/components";
-import type { ShoppingListItem } from "@/types";
+// Zaman formatını hesaplayan fonksiyon
+const formatTimeAgo = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 3600 * 24));
 
-const items = ref<ShoppingListItem[]>([]);
+  return diffInDays === 0 ? "Bugün" : diffInDays === 1 ? "Dün" : `${diffInDays} gün önce`;
+};
+
+// State and Refs
 const selected = ref(false);
 
-const { shoppingListItems, fetchShoppingListItems, isLoading, errorMessage } = useFetchShoppingListItems();
-const { formatDateDifference } = useDateDifference(); // Composable'dan fonksiyonu al
+// Store
+const shoppingListItemsStore = useShoppingListItemsStore();
+const { items, loading: isLoading } = storeToRefs(shoppingListItemsStore);
 
-onMounted(async () => {
-  await fetchShoppingListItems();
+// Real-time synchronization
+const { initializeRealtimeSync } = useRealtimeSync();
 
-  // Veriyi işlerken created_at verisini formatla
-  items.value = shoppingListItems.value.map((item) => ({
-    ...item,
-    formattedDate: formatDateDifference(item.created_at), // Yeni bir alan ekle
-  }));
+// Mounted hook
+onMounted(() => {
+  initializeRealtimeSync();
 });
 </script>
+
+<style scoped>
+/* Add any custom styles here */
+</style>

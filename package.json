@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@nuxt/ui": "^2.19.2",
-    "@nuxtjs/supabase": "^1.4.3"
+    "@nuxtjs/supabase": "^1.4.3",
+    "@pinia/nuxt": "^0.8.0"
   }
 }
