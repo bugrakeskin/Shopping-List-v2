@@ -66,14 +66,17 @@
         :key="category"
         class=""
       >
-        <UDivider class="pl-2 " :ui="{ border: { base: 'border-gray-200 dark:border-gray-800' } }">
+        <UDivider
+          class="pl-2"
+          :ui="{ border: { base: 'border-gray-200 dark:border-gray-800' } }"
+        >
           <div class="font-extralight text-sm flex items-end text-gray-400 dark:text-gray-700">
-           <!--  <UIcon
+            <!--  <UIcon
               :name="getIconType(category)"
               class="self-center  w-5 h-5  "
             /> -->
             <span class="self-center">{{ category }} ({{ items.length }})</span>
-          <!--   <span class="inline-flex items-baseline ">
+            <!--   <span class="inline-flex items-baseline ">
             <UIcon
               :name="getIconType(category)"
               class="self-center rounded-full w-4 h-5  "
@@ -82,7 +85,7 @@
           </span> -->
           </div>
         </UDivider>
-   
+
         <!-- item list -->
         <div
           v-for="item in items"
@@ -94,18 +97,19 @@
             <span class="leading-none text-md md:text-md">{{ item.name }}</span>
           </div>
           <!-- right side -->
-          <div class="flex ">
+          <div class="flex">
             <UButton
               size="xl"
-              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1 "
+              class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1"
               variant="soft"
               icon="solar:cart-plus-outline"
             />
             <UButton
               size="xl"
-              class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1 "
+              class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1"
               variant="soft"
               icon="solar:trash-bin-minimalistic-outline"
+              @click="deleteFromPredefinedItems(item)"
             />
           </div>
         </div>
@@ -136,47 +140,37 @@
 </template>
 
 <script lang="ts" setup>
-import type { PredefinedItem } from "@/types";
+import { computed, ref, onMounted } from "vue";
+import { usePredefinedItemsStore } from "~/stores/predefinedItemsStore";
+import type { PredefinedItem } from "~/types";
 
-// Composable'dan veri çek
-
-const groupedItems = computed(() => {
-  if (!items.value || items.value.length === 0) {
-    return {};
-  }
-
-  return items.value.reduce((groups: Record<string, PredefinedItem[]>, item) => {
-    if (!item.category) {
-      console.warn("Kategori alanı eksik olan ürün:", item);
-      return groups; // Kategorisi olmayan ürünü atla
-    }
-
-    if (!groups[item.category]) {
-      groups[item.category] = [];
-    }
-    groups[item.category].push(item);
-    return groups;
-  }, {});
-});
 const isModalOpen = ref(false);
-const openModal = () => {
-  isModalOpen.value = true;
-};
-const closeModal = () => {
-  isModalOpen.value = false;
-};
-
+const openModal = () => (isModalOpen.value = true);
+const closeModal = () => (isModalOpen.value = false);
 
 // Store
 const predefinedItemsStore = usePredefinedItemsStore();
 const { items, loading: isLoading } = storeToRefs(predefinedItemsStore);
 
-// Real-time synchronization
-const { initializeRealtimeSync } = useRealtimeSync();
+// Group items by category
+const groupedItems = computed(() => {
+  if (!items.value || items.value.length === 0) return {};
+  return items.value.reduce((groups: Record<string, PredefinedItem[]>, item) => {
+    const category = item.category || "Diğer"; // Varsayılan kategori
+    if (!groups[category]) groups[category] = [];
+    groups[category].push(item);
+    return groups;
+  }, {});
+});
+
+// Delete item handler
+const deleteFromPredefinedItems = async (item: PredefinedItem) => {
+  await predefinedItemsStore.deleteItem(item.id);
+};
 
 // Mounted hook
 onMounted(() => {
-  initializeRealtimeSync();
+  predefinedItemsStore.fetchAndSubscribe();
 });
 </script>
 

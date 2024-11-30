@@ -1,4 +1,3 @@
-// stores/predefinedItemsStore.ts
 import { defineStore } from 'pinia';
 import type { PredefinedItem } from '~/types';
 
@@ -36,13 +35,17 @@ export const usePredefinedItemsStore = defineStore('predefinedItems', {
                   this.items.unshift(payload.new as PredefinedItem);
                   break;
                 case 'UPDATE':
-                  const index = this.items.findIndex(item => item.id === payload.new.id);
+                  const index = this.items.findIndex(
+                    (item) => item.id === payload.new.id
+                  );
                   if (index !== -1) {
                     this.items[index] = payload.new as PredefinedItem;
                   }
                   break;
                 case 'DELETE':
-                  this.items = this.items.filter(item => item.id !== payload.old.id);
+                  this.items = this.items.filter(
+                    (item) => item.id !== payload.old.id
+                  );
                   break;
               }
             }
@@ -54,5 +57,24 @@ export const usePredefinedItemsStore = defineStore('predefinedItems', {
         this.loading = false;
       }
     },
+
+    // Predefined Item silme işlemi
+    async deleteItem(itemId: string) {
+      const supabase = useSupabaseClient();
+
+      try {
+        const { error } = await supabase
+          .from('predefined_items')
+          .delete()
+          .eq('id', itemId);
+
+        if (error) throw error;
+
+        // Store'dan item'ı kaldır
+        this.items = this.items.filter((item) => item.id !== itemId);
+      } catch (err) {
+        console.error('Error deleting predefined item:', err);
+      }
+    },
   },
-});
+}); 
