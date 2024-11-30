@@ -5,7 +5,7 @@ export const useRealtimeSync = () => {
   const shoppingListItemsStore = useShoppingListItemsStore()
 
   const initializeRealtimeSync = () => {
-    predefinedItemsStore.fetchItems()
+    predefinedItemsStore.fetchAndSubscribe()
 /*     purchaseHistoryStore.fetchItems() */
     shoppingListItemsStore.fetchItems()
   }

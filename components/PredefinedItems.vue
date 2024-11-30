@@ -139,14 +139,13 @@
 import type { PredefinedItem } from "@/types";
 
 // Composable'dan veri çek
-const { predefinedItems, fetchPredefinedItems, isLoading, errorMessage } = useFetchPredefinedItems();
 
 const groupedItems = computed(() => {
-  if (!predefinedItems.value || predefinedItems.value.length === 0) {
+  if (!items.value || items.value.length === 0) {
     return {};
   }
 
-  return predefinedItems.value.reduce((groups: Record<string, PredefinedItem[]>, item) => {
+  return items.value.reduce((groups: Record<string, PredefinedItem[]>, item) => {
     if (!item.category) {
       console.warn("Kategori alanı eksik olan ürün:", item);
       return groups; // Kategorisi olmayan ürünü atla
@@ -166,8 +165,18 @@ const openModal = () => {
 const closeModal = () => {
   isModalOpen.value = false;
 };
+
+
+// Store
+const predefinedItemsStore = usePredefinedItemsStore();
+const { items, loading: isLoading } = storeToRefs(predefinedItemsStore);
+
+// Real-time synchronization
+const { initializeRealtimeSync } = useRealtimeSync();
+
+// Mounted hook
 onMounted(() => {
-  fetchPredefinedItems(); // Bileşen DOM'a eklendiğinde veriyi çek
+  initializeRealtimeSync();
 });
 </script>
 

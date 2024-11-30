@@ -12,7 +12,7 @@ export const useShoppingListItemsStore = defineStore("shoppingListItems", {
     // Realtime abonelik metodu
     subscribeToRealtimeChanges() {
       const supabase = useSupabaseClient();
-
+      
       supabase
         .channel("shopping_list_items")
         .on("postgres_changes", { event: "*", schema: "public", table: "shopping_list_items" }, (payload) => {
