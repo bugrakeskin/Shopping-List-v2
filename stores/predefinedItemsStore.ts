@@ -119,5 +119,38 @@ export const usePredefinedItemsStore = defineStore("predefinedItems", {
         throw err; // Re-throw the error so we can handle it in the component
       }
     },
+
+    // Yeni ürün ekleme işlemi
+    async addItem(name: string, category: string) {
+      const supabase = useSupabaseClient<Database>();
+
+      try {
+        // Önce aynı isimde ürün var mı kontrol et (case-insensitive)
+        const { data: existingItems, error: searchError } = await supabase
+          .from("predefined_items")
+          .select()
+          .ilike("name", name);
+
+        if (searchError) throw searchError;
+
+        if (existingItems && existingItems.length > 0) {
+          return { error: "Bu ürün zaten mevcut!" };
+        }
+
+        // Yeni ürünü ekle
+        const { data, error } = await supabase
+          .from("predefined_items")
+          .insert([{ name, category }])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        return { data, error: null };
+      } catch (error) {
+        console.error("Error adding predefined item:", error);
+        return { error: "Ürün eklenirken bir hata oluştu" };
+      }
+    },
   },
 });
