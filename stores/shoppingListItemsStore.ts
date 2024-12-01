@@ -47,7 +47,23 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
 
               switch (payload.eventType) {
                 case "INSERT":
-                  this.items.unshift(payload.new as ShoppingListItem);
+                  // Fetch the complete item data including the predefined item
+                  supabase
+                    .from("shopping_list_items")
+                    .select(`
+                      *,
+                      predefined_items (
+                        name,
+                        category
+                      )
+                    `)
+                    .eq('id', payload.new.id)
+                    .single()
+                    .then(({ data, error }) => {
+                      if (!error && data) {
+                        this.items.unshift(data as ShoppingListItem);
+                      }
+                    });
                   break;
                 case "UPDATE":
                   const index = this.items.findIndex(

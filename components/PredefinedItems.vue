@@ -142,9 +142,9 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-// Remove this line
-// Add this line
-import type { Database } from "~/types/database.types"; type PredefinedItem = Database['public']['Tables']['predefined_items']['Row']; import { usePredefinedItemsStore } from "~/stores/predefinedItemsStore";
+import type { Database } from "~/types/database.types";
+type PredefinedItem = Database['public']['Tables']['predefined_items']['Row'];
+import { usePredefinedItemsStore } from "~/stores/predefinedItemsStore";
 import { useShoppingListItemsStore } from "~/stores/shoppingListItemsStore";
 
 const isModalOpen = ref(false);
@@ -169,7 +169,23 @@ const groupedItems = computed(() => {
 
 // Delete item handler
 const deleteFromPredefinedItems = async (item: PredefinedItem) => {
-  await predefinedItemsStore.deleteItem(item.id);
+  try {
+    await predefinedItemsStore.deleteItem(item.id);
+    const toast = useToast();
+    toast.add({
+      title: 'Başarılı',
+      description: 'Ürün başarıyla silindi',
+      color: 'green'
+    });
+  } catch (error) {
+    const toast = useToast();
+    toast.add({
+      title: 'Hata',
+      description: 'Ürün silinirken bir hata oluştu',
+      color: 'red'
+    });
+    console.error('Failed to delete item:', error);
+  }
 };
 
 const addItemToShoppingList = async (item: PredefinedItem) => {

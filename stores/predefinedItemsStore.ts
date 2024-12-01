@@ -65,6 +65,15 @@ export const usePredefinedItemsStore = defineStore("predefinedItems", {
       const supabase = useSupabaseClient<Database>();
 
       try {
+        // First delete related shopping list items
+        const { error: shoppingListError } = await supabase
+          .from("shopping_list_items")
+          .delete()
+          .eq("item_id", itemId);
+
+        if (shoppingListError) throw shoppingListError;
+
+        // Then delete the predefined item
         const { error } = await supabase
           .from("predefined_items")
           .delete()
@@ -76,6 +85,7 @@ export const usePredefinedItemsStore = defineStore("predefinedItems", {
         this.items = this.items.filter((item) => item.id !== itemId);
       } catch (err) {
         console.error("Error deleting predefined item:", err);
+        throw err; // Re-throw the error so we can handle it in the component
       }
     },
   },
