@@ -1,4 +1,3 @@
-import { defineStore } from "pinia";
 import type { Database } from "~/types/database.types";
 
 type PredefinedItem = Database["public"]["Tables"]["predefined_items"]["Row"];
@@ -23,38 +22,70 @@ export const usePredefinedItemsStore = defineStore("predefinedItems", {
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        this.items = data || [];
+
+        // Güvenli veri dönüşümü
+        this.items = Array.isArray(data)
+          ? data.map((item) => ({
+              id: item.id,
+              name: item.name,
+              category: item.category,
+              created_at: item.created_at,
+            }))
+          : [];
 
         // Realtime değişikliklere abone ol
-        supabase
+        const channel = supabase
           .channel("predefined_items")
           .on(
             "postgres_changes",
             { event: "*", schema: "public", table: "predefined_items" },
-            (payload) => {
-              switch (payload.eventType) {
-                case "INSERT":
-                  this.items.unshift(payload.new as PredefinedItem);
-                  break;
-                case "UPDATE":
-                  const index = this.items.findIndex(
-                    (item) => item.id === payload.new.id
-                  );
-                  if (index !== -1) {
-                    this.items[index] = payload.new as PredefinedItem;
-                  }
-                  break;
-                case "DELETE":
-                  this.items = this.items.filter(
-                    (item) => item.id !== payload.old.id
-                  );
-                  break;
+            async (payload) => {
+              try {
+                switch (payload.eventType) {
+                  case "INSERT":
+                    if (payload.new) {
+                      const newItem: PredefinedItem = {
+                        id: payload.new.id,
+                        name: payload.new.name,
+                        category: payload.new.category,
+                        created_at: payload.new.created_at,
+                      };
+                      this.items.unshift(newItem);
+                    }
+                    break;
+                  case "UPDATE":
+                    const index = this.items.findIndex(
+                      (item) => item.id === payload.new?.id
+                    );
+                    if (index !== -1 && payload.new) {
+                      const updatedItem: PredefinedItem = {
+                        id: payload.new.id,
+                        name: payload.new.name,
+                        category: payload.new.category,
+                        created_at: payload.new.created_at,
+                      };
+                      this.items[index] = updatedItem;
+                    }
+                    break;
+                  case "DELETE":
+                    if (payload.old?.id) {
+                      this.items = this.items.filter(
+                        (item) => item.id !== payload.old.id
+                      );
+                    }
+                    break;
+                }
+              } catch (error) {
+                console.error("Real-time update error:", error);
               }
             }
-          )
-          .subscribe();
-      } catch (err) {
-        console.error("Error fetching predefined items:", err);
+          );
+
+        channel.subscribe((status) => {
+          console.log("Subscription status:", status);
+        });
+      } catch (error) {
+        console.error("Error fetching predefined items:", error);
       } finally {
         this.loading = false;
       }

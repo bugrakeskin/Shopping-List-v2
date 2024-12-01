@@ -1,5 +1,3 @@
-import { defineStore } from "pinia";
-import { onUnmounted } from "vue";
 import type { Database } from "~/types/database.types.ts";
 
 type PredefinedItem = Database["public"]["Tables"]["predefined_items"]["Row"];
@@ -40,63 +38,136 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        this.items = data.map(item => ({
-          ...item,
-          formattedDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : ''
-        }));
 
-        // Realtime değişikliklere abone ol
+        this.items = Array.isArray(data)
+          ? data.map((item) => ({
+              id: item.id,
+              created_at: item.created_at,
+              item_id: item.item_id,
+              predefined_items: item.predefined_items
+                ? {
+                    name: item.predefined_items.name,
+                    category: item.predefined_items.category,
+                  }
+                : null,
+              formattedDate: item.created_at
+                ? new Date(item.created_at).toLocaleDateString()
+                : "",
+            }))
+          : [];
+
         const channel = supabase
           .channel("shopping_list_items")
           .on(
             "postgres_changes",
             { event: "*", schema: "public", table: "shopping_list_items" },
-            (payload) => {
-              console.log("Real-time payload:", payload);
+            async (payload) => {
+              try {
+                switch (payload.eventType) {
+                  case "INSERT":
+                    if (payload.new) {
+                      const { data: newItemData, error: fetchError } =
+                        await supabase
+                          .from("shopping_list_items")
+                          .select(
+                            `
+                          *,
+                          predefined_items (
+                            name,
+                            category
+                          )
+                        `
+                          )
+                          .eq("id", payload.new.id)
+                          .single();
 
-              switch (payload.eventType) {
-                case "INSERT":
-                  // Fetch the complete item data including the predefined item
-                  supabase
-                    .from("shopping_list_items")
-                    .select(`
-                      *,
-                      predefined_items (
-                        name,
-                        category
-                      )
-                    `)
-                    .eq('id', payload.new.id)
-                    .single()
-                    .then(({ data, error }) => {
-                      if (!error && data) {
-                        this.items.unshift(data as ShoppingListItem);
+                      if (!fetchError && newItemData) {
+                        const newItem: ShoppingListItem = {
+                          id: newItemData.id,
+                          created_at: newItemData.created_at,
+                          item_id: newItemData.item_id,
+                          predefined_items: newItemData.predefined_items
+                            ? {
+                                name: newItemData.predefined_items.name,
+                                category: newItemData.predefined_items.category,
+                              }
+                            : null,
+                          formattedDate: newItemData.created_at
+                            ? new Date(
+                                newItemData.created_at
+                              ).toLocaleDateString()
+                            : "",
+                        };
+                        this.items.unshift(newItem);
                       }
-                    });
-                  break;
-                case "UPDATE":
-                  const index = this.items.findIndex(
-                    (item) => item.id === payload.new.id
-                  );
-                  if (index !== -1) {
-                    this.items[index] = payload.new as ShoppingListItem;
-                  }
-                  break;
-                case "DELETE":
-                  this.items = this.items.filter(
-                    (item) => item.id !== payload.old.id
-                  );
-                  break;
+                    }
+                    break;
+
+                  case "UPDATE":
+                    if (payload.new) {
+                      const { data: updatedItemData, error: fetchError } =
+                        await supabase
+                          .from("shopping_list_items")
+                          .select(
+                            `
+                          *,
+                          predefined_items (
+                            name,
+                            category
+                          )
+                        `
+                          )
+                          .eq("id", payload.new.id)
+                          .single();
+
+                      if (!fetchError && updatedItemData) {
+                        const updateIndex = this.items.findIndex(
+                          (item) => item.id === payload.new.id
+                        );
+
+                        if (updateIndex !== -1) {
+                          const updatedItem: ShoppingListItem = {
+                            id: updatedItemData.id,
+                            created_at: updatedItemData.created_at,
+                            item_id: updatedItemData.item_id,
+                            predefined_items: updatedItemData.predefined_items
+                              ? {
+                                  name: updatedItemData.predefined_items.name,
+                                  category:
+                                    updatedItemData.predefined_items.category,
+                                }
+                              : null,
+                            formattedDate: updatedItemData.created_at
+                              ? new Date(
+                                  updatedItemData.created_at
+                                ).toLocaleDateString()
+                              : "",
+                          };
+                          this.items[updateIndex] = updatedItem;
+                        }
+                      }
+                    }
+                    break;
+
+                  case "DELETE":
+                    if (payload.old?.id) {
+                      this.items = this.items.filter(
+                        (item) => item.id !== payload.old.id
+                      );
+                    }
+                    break;
+                }
+              } catch (error) {
+                console.error("Real-time update error:", error);
               }
             }
-          )
-          .subscribe();
+          );
 
-        onUnmounted(() => {
-          channel.unsubscribe();
+        channel.subscribe((status) => {
+          console.log("Subscription status:", status);
         });
-      } catch (err) {
-        console.error("Error fetching shopping list items:", err);
+      } catch (error) {
+        console.error("Error fetching shopping list items:", error);
       } finally {
         this.loading = false;
       }
