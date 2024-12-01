@@ -1,5 +1,5 @@
 <template>
-  <nav class="container mx-auto max-w-xl ">
+  <nav>
     <div class="w-full flex justify-center mb-6 rounded-xl">
       <UButtonGroup class="w-full flex items-center justify-center">
         <UButton
