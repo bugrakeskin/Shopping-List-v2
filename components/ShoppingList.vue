@@ -67,7 +67,7 @@
             @update:modelValue="(checked) => handleItemCheck(checked, item)"
             name="notifications"
           />
-          <span 
+          <span
             :class="{ 'line-through': selectedItems[item.id] }"
             class="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300"
             @click="() => handleItemCheck(true, item)"
@@ -78,7 +78,7 @@
 
         <div
           v-if="item.predefined_items"
-          class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 rounded-xl px-2 py-1 space-x-1 md:space-x-2"
+          class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800  rounded-xl px-2 py-1 space-x-1 md:space-x-2"
         >
           <span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
           <UIcon
@@ -119,7 +119,7 @@ const formatTimeAgo = (dateString: string) => {
 // Handle checkbox changes
 const handleItemCheck = async (checked: boolean, item: any) => {
   if (!item.id) return;
-  
+
   // Update the local state immediately for UI feedback
   selectedItems.value = {
     ...selectedItems.value,
