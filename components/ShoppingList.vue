@@ -64,15 +64,24 @@
           class="scale-100"
           v-model="selected"
           name="notifications"
-          :label="item.predefined_items.name"
+          :label="item.predefined_items?.name ?? 'Unnamed Item'"
         />
 
-        <div class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 rounded-xl px-2 py-1 space-x-1 md:space-x-2">
+        <div
+          v-if="item.predefined_items"
+          class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 rounded-xl px-2 py-1 space-x-1 md:space-x-2"
+        >
           <span class="text-xs font-light">{{ item.formattedDate }}</span>
           <UIcon
-            :name="getIconType(item.predefined_items.category)"
+            :name="getIconType(item.predefined_items?.category || 'default-category')"
             class=""
           />
+        </div>
+        <div
+          v-else
+          class="flex text-gray-500 dark:text-gray-300 items-center"
+        >
+          <span class="text-xs font-light">{{ item.formattedDate }}</span>
         </div>
       </div>
     </UCard>
@@ -87,7 +96,7 @@ const selected = ref(false);
 
 // Store
 const shoppingListItemsStore = useShoppingListItemsStore();
-const { formattedItems: items, loading: isLoading } = storeToRefs(shoppingListItemsStore);
+const { items, loading: isLoading } = storeToRefs(shoppingListItemsStore);
 
 // Real-time synchronization
 onMounted(() => {

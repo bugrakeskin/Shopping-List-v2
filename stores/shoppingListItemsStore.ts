@@ -4,7 +4,13 @@ import type { Database } from "~/types/database.types.ts";
 
 type PredefinedItem = Database["public"]["Tables"]["predefined_items"]["Row"];
 type ShoppingListItem =
-  Database["public"]["Tables"]["shopping_list_items"]["Row"];
+  Database["public"]["Tables"]["shopping_list_items"]["Row"] & {
+    predefined_items: {
+      name: string | null;
+      category: string | null;
+    } | null;
+    formattedDate?: string;
+  };
 
 export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
   state: () => ({
@@ -34,7 +40,10 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        this.items = data;
+        this.items = data.map(item => ({
+          ...item,
+          formattedDate: item.created_at ? new Date(item.created_at).toLocaleDateString() : ''
+        }));
 
         // Realtime değişikliklere abone ol
         const channel = supabase
