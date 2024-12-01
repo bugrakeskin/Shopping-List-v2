@@ -1,4 +1,6 @@
-import type { ShoppingListItem } from "@/types";
+import type { Database } from "~/types/database.types";
+
+type ShoppingListItem = Database['public']['Tables']['shopping_list_items']['Row'];
 
 export const useFetchShoppingListItems = () => {
   const shoppingListItems = ref<ShoppingListItem[]>([]);

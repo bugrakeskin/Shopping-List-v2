@@ -1,6 +1,10 @@
 import { defineStore } from "pinia";
 import { onUnmounted } from "vue";
-import type { ShoppingListItem } from "~/types";
+import type { Database } from "~/types/database.types.ts";
+
+type PredefinedItem = Database["public"]["Tables"]["predefined_items"]["Row"];
+type ShoppingListItem =
+  Database["public"]["Tables"]["shopping_list_items"]["Row"];
 
 export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
   state: () => ({
@@ -12,7 +16,7 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
     // Verileri çek ve realtime aboneliği başlat
     async fetchAndSubscribe() {
       this.loading = true;
-      const supabase = useSupabaseClient();
+      const supabase = useSupabaseClient<Database>();
 
       try {
         // Verileri Supabase'den çek
@@ -30,7 +34,7 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        this.items = data || [];
+        this.items = data;
 
         // Realtime değişikliklere abone ol
         const channel = supabase
@@ -39,7 +43,7 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
             "postgres_changes",
             { event: "*", schema: "public", table: "shopping_list_items" },
             (payload) => {
-              console.log("Real-time payload:", payload); // Payload'ı logla, hata olup olmadığını kontrol et
+              console.log("Real-time payload:", payload);
 
               switch (payload.eventType) {
                 case "INSERT":
@@ -63,9 +67,7 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
           )
           .subscribe();
 
-        // Cleanup subscription when the component is destroyed
         onUnmounted(() => {
-          console.log("Unsubscribing from real-time updates.");
           channel.unsubscribe();
         });
       } catch (err) {
@@ -75,9 +77,25 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
       }
     },
 
+    // Add item to shopping list
+    async addItemToShoppingList(item: PredefinedItem) {
+      const supabase = useSupabaseClient<Database>();
+
+      try {
+        const { error } = await supabase.from("shopping_list_items").insert({
+          item_id: item.id,
+        });
+
+        if (error) throw error;
+      } catch (error) {
+        console.error("Error adding item to shopping list:", error);
+        throw error;
+      }
+    },
+
     // Item silme işlemi
     async deleteItem(itemId: string) {
-      const supabase = useSupabaseClient();
+      const supabase = useSupabaseClient<Database>();
 
       try {
         const { error } = await supabase
@@ -87,7 +105,7 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
 
         if (error) throw error;
 
-        // Store'dan item'ı kaldır
+        // Update local state
         this.items = this.items.filter((item) => item.id !== itemId);
       } catch (err) {
         console.error("Error deleting shopping list item:", err);

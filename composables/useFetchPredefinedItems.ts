@@ -1,4 +1,6 @@
-import type { PredefinedItem } from "@/types";
+import type { Database } from "~/types/database.types";
+
+type PredefinedItem = Database['public']['Tables']['predefined_items']['Row'];
 
 export const useFetchPredefinedItems = () => {
   const predefinedItems = ref<PredefinedItem[]>([]);

@@ -103,6 +103,7 @@
               class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1"
               variant="soft"
               icon="solar:cart-plus-outline"
+              @click="addItemToShoppingList(item)"
             />
             <UButton
               size="xl"
@@ -140,9 +141,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, onMounted } from "vue";
-import { usePredefinedItemsStore } from "~/stores/predefinedItemsStore";
-import type { PredefinedItem } from "~/types";
+import { ref } from "vue";
+// Remove this line
+// Add this line
+import type { Database } from "~/types/database.types"; type PredefinedItem = Database['public']['Tables']['predefined_items']['Row']; import { usePredefinedItemsStore } from "~/stores/predefinedItemsStore";
+import { useShoppingListItemsStore } from "~/stores/shoppingListItemsStore";
 
 const isModalOpen = ref(false);
 const openModal = () => (isModalOpen.value = true);
@@ -150,6 +153,7 @@ const closeModal = () => (isModalOpen.value = false);
 
 // Store
 const predefinedItemsStore = usePredefinedItemsStore();
+const shoppingListStore = useShoppingListItemsStore();
 const { items, loading: isLoading } = storeToRefs(predefinedItemsStore);
 
 // Group items by category
@@ -166,6 +170,16 @@ const groupedItems = computed(() => {
 // Delete item handler
 const deleteFromPredefinedItems = async (item: PredefinedItem) => {
   await predefinedItemsStore.deleteItem(item.id);
+};
+
+const addItemToShoppingList = async (item: PredefinedItem) => {
+  try {
+    await shoppingListStore.addItemToShoppingList(item);
+    // Optional: Show success message
+  } catch (error) {
+    // Handle error (maybe show error message to user)
+    console.error('Failed to add item to shopping list:', error);
+  }
 };
 
 // Mounted hook

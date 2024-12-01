@@ -1,7 +1,9 @@
-import { defineStore } from 'pinia';
-import type { PredefinedItem } from '~/types';
+import { defineStore } from "pinia";
+import type { Database } from "~/types/database.types";
 
-export const usePredefinedItemsStore = defineStore('predefinedItems', {
+type PredefinedItem = Database["public"]["Tables"]["predefined_items"]["Row"];
+
+export const usePredefinedItemsStore = defineStore("predefinedItems", {
   state: () => ({
     items: [] as PredefinedItem[],
     loading: false,
@@ -11,30 +13,30 @@ export const usePredefinedItemsStore = defineStore('predefinedItems', {
     // Verileri çek ve realtime aboneliği başlat
     async fetchAndSubscribe() {
       this.loading = true;
-      const supabase = useSupabaseClient();
+      const supabase = useSupabaseClient<Database>();
 
       try {
         // Verileri Supabase'den çek
         const { data, error } = await supabase
-          .from('predefined_items')
-          .select('*')
-          .order('created_at', { ascending: false });
+          .from("predefined_items")
+          .select("*")
+          .order("created_at", { ascending: false });
 
         if (error) throw error;
         this.items = data || [];
 
         // Realtime değişikliklere abone ol
         supabase
-          .channel('predefined_items')
+          .channel("predefined_items")
           .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'predefined_items' },
+            "postgres_changes",
+            { event: "*", schema: "public", table: "predefined_items" },
             (payload) => {
               switch (payload.eventType) {
-                case 'INSERT':
+                case "INSERT":
                   this.items.unshift(payload.new as PredefinedItem);
                   break;
-                case 'UPDATE':
+                case "UPDATE":
                   const index = this.items.findIndex(
                     (item) => item.id === payload.new.id
                   );
@@ -42,7 +44,7 @@ export const usePredefinedItemsStore = defineStore('predefinedItems', {
                     this.items[index] = payload.new as PredefinedItem;
                   }
                   break;
-                case 'DELETE':
+                case "DELETE":
                   this.items = this.items.filter(
                     (item) => item.id !== payload.old.id
                   );
@@ -52,7 +54,7 @@ export const usePredefinedItemsStore = defineStore('predefinedItems', {
           )
           .subscribe();
       } catch (err) {
-        console.error('Error fetching predefined items:', err);
+        console.error("Error fetching predefined items:", err);
       } finally {
         this.loading = false;
       }
@@ -60,21 +62,21 @@ export const usePredefinedItemsStore = defineStore('predefinedItems', {
 
     // Predefined Item silme işlemi
     async deleteItem(itemId: string) {
-      const supabase = useSupabaseClient();
+      const supabase = useSupabaseClient<Database>();
 
       try {
         const { error } = await supabase
-          .from('predefined_items')
+          .from("predefined_items")
           .delete()
-          .eq('id', itemId);
+          .eq("id", itemId);
 
         if (error) throw error;
 
         // Store'dan item'ı kaldır
         this.items = this.items.filter((item) => item.id !== itemId);
       } catch (err) {
-        console.error('Error deleting predefined item:', err);
+        console.error("Error deleting predefined item:", err);
       }
     },
   },
-}); 
+});
