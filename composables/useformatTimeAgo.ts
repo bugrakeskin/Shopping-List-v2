@@ -1,4 +1,4 @@
-const formatTimeAgo = (dateString: string) => {
+export const formatTimeAgo = (dateString: string) => {
   const date = new Date(dateString)
   const now = new Date()
   const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 3600 * 24))

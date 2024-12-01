@@ -1,3 +1,4 @@
+<!-- ShoppingList.vue -->
 <template>
   <div class="container mx-auto max-w-xl mb-4 gap-4 grid">
     <!-- Loading State -->
@@ -79,22 +80,18 @@
 </template>
 
 <script lang="ts" setup>
-import { Base } from "#build/components";
-import type { ShoppingListItem } from "@/types";
+import { onMounted } from 'vue';
 
-const items = ref<ShoppingListItem[]>([]);
+// State and Refs
 const selected = ref(false);
 
-const { shoppingListItems, fetchShoppingListItems, isLoading, errorMessage } = useFetchShoppingListItems();
-const { formatDateDifference } = useDateDifference(); // Composable'dan fonksiyonu al
+// Store
+const shoppingListItemsStore = useShoppingListItemsStore();
+const { formattedItems: items, loading: isLoading } = storeToRefs(shoppingListItemsStore);
 
-onMounted(async () => {
-  await fetchShoppingListItems();
-
-  // Veriyi işlerken created_at verisini formatla
-  items.value = shoppingListItems.value.map((item) => ({
-    ...item,
-    formattedDate: formatDateDifference(item.created_at), // Yeni bir alan ekle
-  }));
+// Real-time synchronization
+onMounted(() => {
+  shoppingListItemsStore.fetchAndSubscribe();  // This ensures that data is fetched and real-time sync starts
 });
+
 </script>

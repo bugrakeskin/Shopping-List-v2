@@ -1,25 +1,22 @@
 // type/types.ts
 export type PredefinedItem = {
-  id: string; // UUID veya başka bir tür olabilir
+  id: string;
   name: string;
-  created_at: string; // ISO tarih formatı
+  created_at: string;
   category: string;
 };
 
 export type ShoppingListItem = {
-  item_id: string;
   id: string;
+  name: string;
+  category: string;
+  predefined_item_id: string;
   created_at: string;
-  formattedDate: string;
-  predefined_items: {
-    name: string;
-    category: string;
-  };
 };
 
 export type PurchaseHistory = {
-  id: string; // UUID
-  item_id: string; // PredefinedItem'den foreign key
-  created_at: string; // ISO tarih formatı
-  purchase_date: string; // ISO tarih formatı
+  id: string;
+  item_id: string;
+  purchased_at: string;
+  quantity: number;
 };

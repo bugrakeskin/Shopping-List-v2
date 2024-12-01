@@ -1,102 +1,96 @@
-// stores/shoppingListItemsStore.ts
 import { defineStore } from "pinia";
+import { onUnmounted } from "vue";
 import type { ShoppingListItem } from "~/types";
 
-export const useShoppingListItemsStore = defineStore("shoppingListItems", {
+export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
   state: () => ({
     items: [] as ShoppingListItem[],
     loading: false,
-    error: null as Error | null,
   }),
+
   actions: {
-    // Realtime abonelik metodu
-    subscribeToRealtimeChanges() {
-      const supabase = useSupabaseClient();
-      
-      supabase
-        .channel("shopping_list_items")
-        .on("postgres_changes", { event: "*", schema: "public", table: "shopping_list_items" }, (payload) => {
-          switch (payload.eventType) {
-            case "INSERT":
-              this.handleInsert(payload.new as ShoppingListItem);
-              break;
-            case "UPDATE":
-              this.handleUpdate(payload.new as ShoppingListItem);
-              break;
-            case "DELETE":
-              this.handleDelete(payload.old.id);
-              break;
-          }
-        })
-        .subscribe();
-    },
-
-    // INSERT handling
-    async handleInsert(newItem: ShoppingListItem) {
-      const supabase = useSupabaseClient();
-
-      try {
-        // Supabase'den predefined_item ilişkisini çek
-        const { data: predefinedItem, error } = await supabase
-          .from("predefined_items")
-          .select("name, category")
-          .eq("id", newItem.item_id) // Burada ilişkili `item_id`ye göre sorgu yap
-          .single();
-
-        if (error) {
-          console.error("Predefined item fetch error:", error);
-          // Eğer hata varsa varsayılan değer ata
-          newItem.predefined_items = {
-            name: "Bilinmeyen Ürün",
-            category: "default-category",
-          };
-        } else if (predefinedItem) {
-          // Eğer başarıyla ilişki çekildiyse
-          newItem.predefined_items = predefinedItem;
-        }
-
-        // Yeni öğeyi mevcut listeye ekle
-        const existingItemIndex = this.items.findIndex((item) => item.id === newItem.id);
-        if (existingItemIndex === -1) {
-          this.items = [newItem, ...this.items];
-        }
-      } catch (err) {
-        console.error("Error in handleInsert:", err);
-      }
-    },
-
-    // UPDATE handling
-    handleUpdate(updatedItem: ShoppingListItem) {
-      const index = this.items.findIndex((item) => item.id === updatedItem.id);
-      if (index !== -1) {
-        this.items[index] = updatedItem; // Array'i yeniden atama
-      }
-    },
-
-    // DELETE handling
-    handleDelete(itemId: string) {
-      this.items = this.items.filter((item) => item.id !== itemId); // Array'i yeniden atama
-    },
-
-    // Initial data fetch
-    async fetchItems() {
+    // Verileri çek ve realtime aboneliği başlat
+    async fetchAndSubscribe() {
       this.loading = true;
+      const supabase = useSupabaseClient();
+
       try {
-        const supabase = useSupabaseClient();
+        // Verileri Supabase'den çek
         const { data, error } = await supabase
           .from("shopping_list_items")
-          .select("*, predefined_items(name, category)") // predefined_items ilişkisini ekle
+          .select(
+            `
+            *,
+            predefined_items (
+              name,
+              category
+            )
+          `
+          )
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-
         this.items = data || [];
-        this.subscribeToRealtimeChanges();
+
+        // Realtime değişikliklere abone ol
+        const channel = supabase
+          .channel("shopping_list_items")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "shopping_list_items" },
+            (payload) => {
+              console.log("Real-time payload:", payload); // Payload'ı logla, hata olup olmadığını kontrol et
+
+              switch (payload.eventType) {
+                case "INSERT":
+                  this.items.unshift(payload.new as ShoppingListItem);
+                  break;
+                case "UPDATE":
+                  const index = this.items.findIndex(
+                    (item) => item.id === payload.new.id
+                  );
+                  if (index !== -1) {
+                    this.items[index] = payload.new as ShoppingListItem;
+                  }
+                  break;
+                case "DELETE":
+                  this.items = this.items.filter(
+                    (item) => item.id !== payload.old.id
+                  );
+                  break;
+              }
+            }
+          )
+          .subscribe();
+
+        // Cleanup subscription when the component is destroyed
+        onUnmounted(() => {
+          console.log("Unsubscribing from real-time updates.");
+          channel.unsubscribe();
+        });
       } catch (err) {
-        this.error = err as Error;
-        console.error("Error fetching items:", err);
+        console.error("Error fetching shopping list items:", err);
       } finally {
         this.loading = false;
+      }
+    },
+
+    // Item silme işlemi
+    async deleteItem(itemId: string) {
+      const supabase = useSupabaseClient();
+
+      try {
+        const { error } = await supabase
+          .from("shopping_list_items")
+          .delete()
+          .eq("id", itemId);
+
+        if (error) throw error;
+
+        // Store'dan item'ı kaldır
+        this.items = this.items.filter((item) => item.id !== itemId);
+      } catch (err) {
+        console.error("Error deleting shopping list item:", err);
       }
     },
   },
