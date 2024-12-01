@@ -121,8 +121,17 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
     // Item silme işlemi
     async deleteItem(itemId: string) {
       const supabase = useSupabaseClient<Database>();
+      const purchaseHistoryStore = usePurchaseHistoryStore();
 
       try {
+        // First find the item to get its item_id
+        const item = this.items.find((item) => item.id === itemId);
+        if (!item || !item.item_id) throw new Error("Item not found");
+
+        // Add to purchase history
+        await purchaseHistoryStore.addToPurchaseHistory(item.item_id);
+
+        // Then delete from shopping list
         const { error } = await supabase
           .from("shopping_list_items")
           .delete()
@@ -134,6 +143,7 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
         this.items = this.items.filter((item) => item.id !== itemId);
       } catch (err) {
         console.error("Error deleting shopping list item:", err);
+        throw err;
       }
     },
   },

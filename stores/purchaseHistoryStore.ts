@@ -98,5 +98,22 @@ export const usePurchaseHistoryStore = defineStore("purchaseHistory", {
         this.loading = false;
       }
     },
+    async addToPurchaseHistory(itemId: string) {
+      const supabase = useSupabaseClient<Database>();
+      
+      try {
+        const { error } = await supabase
+          .from("purchase_history")
+          .insert({
+            item_id: itemId,
+            purchase_date: new Date().toISOString()
+          });
+
+        if (error) throw error;
+      } catch (error) {
+        console.error("Error adding item to purchase history:", error);
+        throw error;
+      }
+    },
   },
 });
