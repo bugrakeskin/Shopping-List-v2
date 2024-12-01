@@ -60,18 +60,27 @@
         :key="item.id"
         class="pl-2 py-1 flex items-center justify-between cursor-pointer"
       >
-        <UCheckbox
-          class="scale-100"
-          v-model="selected"
-          name="notifications"
-          :label="item.predefined_items?.name ?? 'Unnamed Item'"
-        />
+        <div class="flex items-center gap-2">
+          <UCheckbox
+            class="scale-100"
+            :modelValue="!!selectedItems[item.id]"
+            @update:modelValue="(checked) => handleItemCheck(checked, item)"
+            name="notifications"
+          />
+          <span 
+            :class="{ 'line-through': selectedItems[item.id] }"
+            class="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300"
+            @click="() => handleItemCheck(true, item)"
+          >
+            {{ item.predefined_items?.name ?? 'Unnamed Item' }}
+          </span>
+        </div>
 
         <div
           v-if="item.predefined_items"
           class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 rounded-xl px-2 py-1 space-x-1 md:space-x-2"
         >
-          <span class="text-xs font-light">{{ item.formattedDate }}</span>
+          <span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
           <UIcon
             :name="getIconType(item.predefined_items?.category || 'default-category')"
             class=""
@@ -81,7 +90,7 @@
           v-else
           class="flex text-gray-500 dark:text-gray-300 items-center"
         >
-          <span class="text-xs font-light">{{ item.formattedDate }}</span>
+          <span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
         </div>
       </div>
     </UCard>
@@ -92,11 +101,51 @@
 import { onMounted } from 'vue';
 
 // State and Refs
-const selected = ref(false);
+const selectedItems = ref<Record<string, boolean>>({});
 
 // Store
 const shoppingListItemsStore = useShoppingListItemsStore();
 const { items, loading: isLoading } = storeToRefs(shoppingListItemsStore);
+
+// Format time ago function
+const formatTimeAgo = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 3600 * 24));
+
+  return diffInDays === 0 ? "Bugün" : diffInDays === 1 ? "Dün" : `${diffInDays} gün önce`;
+};
+
+// Handle checkbox changes
+const handleItemCheck = async (checked: boolean, item: any) => {
+  if (!item.id) return;
+  
+  // Update the local state immediately for UI feedback
+  selectedItems.value = {
+    ...selectedItems.value,
+    [item.id]: checked
+  };
+
+  if (checked) {
+    // Delete the item after a short delay to show the strikethrough effect
+    setTimeout(async () => {
+      try {
+        await shoppingListItemsStore.deleteItem(item.id);
+        // Remove the item from selectedItems after successful deletion
+        const newSelectedItems = { ...selectedItems.value };
+        delete newSelectedItems[item.id];
+        selectedItems.value = newSelectedItems;
+      } catch (error) {
+        console.error('Error deleting item:', error);
+        // Revert the checkbox state if deletion fails
+        selectedItems.value = {
+          ...selectedItems.value,
+          [item.id]: false
+        };
+      }
+    }, 500);
+  }
+};
 
 // Real-time synchronization
 onMounted(() => {

@@ -1,8 +1,7 @@
 <template>
   <div class="p-4 gap-4 grid">
     <NavBar2 />
-<!--     <ShoppingList />
- -->    <TestRealtime />
+    <ShoppingList />
     <PredefinedItems />
     <Footer />
   </div>
