@@ -191,9 +191,17 @@ const deleteFromPredefinedItems = async (item: PredefinedItem) => {
 const addItemToShoppingList = async (item: PredefinedItem) => {
   try {
     await shoppingListStore.addItemToShoppingList(item);
-    // Optional: Show success message
+    useToast().add({
+      title: 'Başarılı',
+      description: 'Ürün alışveriş listenize eklendi.',
+      color: 'green'
+    });
   } catch (error) {
-    // Handle error (maybe show error message to user)
+    useToast().add({
+      title: 'Hata',
+      description: error instanceof Error ? error.message : 'Ürün eklenirken bir hata oluştu.',
+      color: 'red'
+    });
     console.error('Failed to add item to shopping list:', error);
   }
 };

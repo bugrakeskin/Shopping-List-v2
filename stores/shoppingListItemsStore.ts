@@ -178,6 +178,19 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
       const supabase = useSupabaseClient<Database>();
 
       try {
+        // Önce item_id'ye göre kontrol edelim
+        const { data: existingItem } = await supabase
+          .from("shopping_list_items")
+          .select()
+          .eq("item_id", item.id)
+          .single();
+
+        // Eğer ürün zaten varsa, eklemeyi iptal edelim
+        if (existingItem) {
+          throw new Error("Bu ürün zaten alışveriş listenizde bulunuyor.");
+        }
+
+        // Ürün listede yoksa ekleyelim
         const { error } = await supabase.from("shopping_list_items").insert({
           item_id: item.id,
         });

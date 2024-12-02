@@ -78,7 +78,7 @@
 
         <div
           v-if="item.predefined_items"
-          class="flex text-gray-500 dark:text-gray-300 items-center border border-gray-100 dark:border-gray-800  rounded-xl px-2 py-1 space-x-1 md:space-x-2"
+          class="flex text-gray-500 dark:text-gray-300 items-center   rounded-xl px-2 py-1 space-x-1 md:space-x-2"
         >
           <span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
           <UIcon
