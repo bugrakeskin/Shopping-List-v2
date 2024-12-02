@@ -1,8 +1,8 @@
 <template>
-  <div class="container mx-auto max-w-xl gap-4 grid">
+  <div>
     <div v-if="isLoading">
+      <!-- skeleton loading -->
       <UCard class="space-y-4 p-2">
-        <!-- Header skeleton -->
         <div class="flex items-start justify-between mb-6">
           <div class="grid space-y-2">
             <USkeleton class="h-10 w-10 rounded-full" />
@@ -10,8 +10,6 @@
           </div>
           <USkeleton class="h-8 w-24 rounded" />
         </div>
-
-        <!-- List item skeletons -->
         <div class="space-y-3">
           <div
             v-for="i in 3"
@@ -27,28 +25,6 @@
     </div>
     <UCard v-else-if="groupedItems && Object.keys(groupedItems).length > 0">
       <!-- Header -->
-      <!--   <UDivider :ui="{ border: { base: 'border-gray-100 dark:border-gray-600' } }">
-        <div class="flex items-center justify-center space-x-1 mb-4">
-          <UIcon
-            size="30px"
-            name="material-symbols:grocery-sharp"
-            class="text-green-600 dark:text-green-600"
-          />
-          <span class="text-xl font-light">Ürünler</span>
-        </div>
-      </UDivider> -->
-      <!--   <div class="flex items-center space-x-1 mb-4">
-        <div>
-          <UIcon
-            size="25px"
-            name="material-symbols:grocery-sharp"
-            class="text-green-600 dark:text-green-600"
-          />
-        </div>
-        <div>
-          <span class="text-lg leading-none font-light">Ürünler</span>
-        </div>
-      </div> -->
 
       <div>
         <span class="inline-flex items-baseline mb-2">
@@ -61,28 +37,15 @@
       </div>
 
       <!-- Grouped Catergory Items -->
-      <div
-        v-for="(items, category) in groupedItems"
-        :key="category"
-        class=""
-      >
+      <div v-for="(items, category) in groupedItems" :key="category" class="">
         <UDivider
           class="pl-2"
           :ui="{ border: { base: 'border-gray-200 dark:border-gray-800' } }"
         >
-          <div class="font-extralight text-sm flex items-end text-gray-400 dark:text-gray-700">
-            <!--  <UIcon
-              :name="getIconType(category)"
-              class="self-center  w-5 h-5  "
-            /> -->
+          <div
+            class="font-extralight text-sm flex items-end text-gray-400 dark:text-gray-700"
+          >
             <span class="self-center">{{ category }} ({{ items.length }})</span>
-            <!--   <span class="inline-flex items-baseline ">
-            <UIcon
-              :name="getIconType(category)"
-              class="self-center rounded-full w-4 h-5  "
-            />
-            <span class="text-sm text-gray-400 dark:text-gray-600 font-light mr-1 w-16">{{ category }}</span>
-          </span> -->
           </div>
         </UDivider>
 
@@ -134,16 +97,13 @@
     </div>
     <!-- main div -->
   </div>
-  <AddPredefinedItemsModal
-    :isOpen="isModalOpen"
-    @close="closeModal"
-  />
+  <AddPredefinedItemsModal :isOpen="isModalOpen" @close="closeModal" />
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
 import type { Database } from "~/types/database.types";
-type PredefinedItem = Database['public']['Tables']['predefined_items']['Row'];
+type PredefinedItem = Database["public"]["Tables"]["predefined_items"]["Row"];
 import { usePredefinedItemsStore } from "~/stores/predefinedItemsStore";
 import { useShoppingListItemsStore } from "~/stores/shoppingListItemsStore";
 
@@ -159,12 +119,15 @@ const { items, loading: isLoading } = storeToRefs(predefinedItemsStore);
 // Group items by category
 const groupedItems = computed(() => {
   if (!items.value || items.value.length === 0) return {};
-  return items.value.reduce((groups: Record<string, PredefinedItem[]>, item) => {
-    const category = item.category || "Diğer"; // Varsayılan kategori
-    if (!groups[category]) groups[category] = [];
-    groups[category].push(item);
-    return groups;
-  }, {});
+  return items.value.reduce(
+    (groups: Record<string, PredefinedItem[]>, item) => {
+      const category = item.category || "Diğer"; // Varsayılan kategori
+      if (!groups[category]) groups[category] = [];
+      groups[category].push(item);
+      return groups;
+    },
+    {}
+  );
 });
 
 // Delete item handler
@@ -173,18 +136,18 @@ const deleteFromPredefinedItems = async (item: PredefinedItem) => {
     await predefinedItemsStore.deleteItem(item.id);
     const toast = useToast();
     toast.add({
-      title: 'Başarılı',
-      description: 'Ürün başarıyla silindi',
-      color: 'green'
+      title: "Başarılı",
+      description: "Ürün başarıyla silindi",
+      color: "green",
     });
   } catch (error) {
     const toast = useToast();
     toast.add({
-      title: 'Hata',
-      description: 'Ürün silinirken bir hata oluştu',
-      color: 'red'
+      title: "Hata",
+      description: "Ürün silinirken bir hata oluştu",
+      color: "red",
     });
-    console.error('Failed to delete item:', error);
+    console.error("Failed to delete item:", error);
   }
 };
 
@@ -192,17 +155,20 @@ const addItemToShoppingList = async (item: PredefinedItem) => {
   try {
     await shoppingListStore.addItemToShoppingList(item);
     useToast().add({
-      title: 'Başarılı',
-      description: 'Ürün alışveriş listenize eklendi.',
-      color: 'green'
+      title: "Başarılı",
+      description: "Ürün alışveriş listenize eklendi.",
+      color: "green",
     });
   } catch (error) {
     useToast().add({
-      title: 'Hata',
-      description: error instanceof Error ? error.message : 'Ürün eklenirken bir hata oluştu.',
-      color: 'red'
+      title: "Hata",
+      description:
+        error instanceof Error
+          ? error.message
+          : "Ürün eklenirken bir hata oluştu.",
+      color: "red",
     });
-    console.error('Failed to add item to shopping list:', error);
+    console.error("Failed to add item to shopping list:", error);
   }
 };
 

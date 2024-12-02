@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mt-4 container max-w-xl mx-auto flex items-center justify-between dark:text-gray-500 text-xs text-gray-400 py-2 px-6"
+    class=" container max-w-xl mx-auto flex items-center justify-between dark:text-gray-500 text-xs text-gray-400 py-4 px-6"
   >
     <div>
       <span>&copy; 2024 BK</span>

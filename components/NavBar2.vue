@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-xl pt-4">
+  <div class="container mx-auto max-w-xl py-4">
 
     <UHorizontalNavigation
       :links="links"
