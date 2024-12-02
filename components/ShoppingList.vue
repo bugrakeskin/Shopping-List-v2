@@ -32,17 +32,6 @@
     </div>
     <!-- Items Loaded State -->
     <UCard v-else>
-      <!-- Header -->
-      <!--     <UDivider :ui="{ border: { base: 'border-gray-100 dark:border-gray-600' } }">
-      <div class="flex items-center justify-center space-x-1">
-        <UIcon
-          size="30px"
-          name="material-symbols:check-box-outline-rounded"
-          class="text-green-600 dark:text-green-600"
-        />
-        <span class="text-xl font-light">Alışveriş Listesi</span>
-      </div>
-    </UDivider> -->
 
       <div>
         <span class="inline-flex items-baseline mb-2">
@@ -78,7 +67,7 @@
 
         <div
           v-if="item.predefined_items"
-          class="flex text-gray-500 dark:text-gray-300 items-center   rounded-xl px-2 py-1 space-x-1 md:space-x-2"
+          class="flex text-gray-500 dark:text-gray-300 items-center rounded-xl px-2 py-1 space-x-1 md:space-x-2"
         >
           <span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
           <UIcon

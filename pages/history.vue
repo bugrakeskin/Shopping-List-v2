@@ -20,7 +20,7 @@
 
     <UCard
       v-else
-      class="grid gap-4"
+      class="grid gap-4 max-h-[calc(100vh-8rem)] overflow-auto"
     >
       <div>
         <span class="inline-flex items-baseline mb-2">
@@ -31,24 +31,27 @@
           <span class="text-xl font-thin">Geçmiş</span>
         </span>
       </div>
-      <div
-        v-for="item in purchaseHistoryStore.items"
-        :key="item.id"
-        class="rounded-lg  p-2 flex items-center justify-between"
-      >
-        <div>
-          <h3 class="font-medium">{{ item.item_name || 'Silinmiş Ürün' }}</h3>
+      <div class="overflow-y-auto">
+        <div
+          v-for="item in purchaseHistoryStore.items"
+          :key="item.id"
+          class="rounded-lg  p-2 flex items-center justify-between"
+        >
+          <div>
+            <h3 class="font-medium">{{ item.item_name || 'Silinmiş Ürün' }}</h3>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-300 ">
+            {{ new Date(item.created_at).toLocaleDateString('tr-TR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            }) }}
+          </p>
         </div>
-        <p class="text-sm ">
-          {{ new Date(item.created_at).toLocaleDateString('tr-TR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          }) }}
-        </p>
       </div>
+
     </UCard>
   </div>
 </template>

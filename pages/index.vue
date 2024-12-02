@@ -3,7 +3,6 @@
 
     <ShoppingList />
     <PredefinedItems />
-    <Footer />
   </div>
 </template>
 
