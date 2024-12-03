@@ -30,7 +30,8 @@ export const usePurchaseHistoryStore = defineStore("purchaseHistory", {
             )
           `
           )
-          .order("created_at", { ascending: false });
+          .order("created_at", { ascending: false })
+          .limit(45);
 
         if (error) throw error;
 
