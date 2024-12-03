@@ -101,8 +101,11 @@ const handleSubmit = async () => {
   showSuccessMessage.value = false;
 
   try {
+    // Capitalize the first letter of the product name
+    const capitalizedName = formState.value.name.charAt(0).toLocaleUpperCase('tr-TR') + formState.value.name.slice(1);
+    
     const result = await predefinedItemsStore.addItem(
-      formState.value.name,
+      capitalizedName,
       formState.value.category
     );
 
