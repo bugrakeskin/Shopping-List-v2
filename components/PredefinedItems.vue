@@ -21,7 +21,7 @@
 			</UCard>
 		</div>
 		<template v-else>
-			<UCard class="max-h-[40vh] overflow-auto" v-if="items.length > 0">
+			<UCard class="max-h-[45vh] overflow-auto" v-if="items.length > 0">
 				<!-- Header -->
 
 				<div class="flex items-start justify-between">
@@ -84,12 +84,13 @@
 						</template>
 					</UAccordion>
 				</div>
-				<div class="flex items-start justify-end pt-2">
-					<UButton block square color="gray" @click="openModal" variant="solid" size="xs" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
-				</div>
 			</UCard>
+
 			<div v-else>
 				<p class="text-center text-gray-500 py-2">Hiç ürün bulunamadı.</p>
+			</div>
+			<div class="flex items-start justify-end pt-2">
+				<UButton block square color="gray" @click="openModal" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
 			</div>
 		</template>
 		<!-- main div -->
