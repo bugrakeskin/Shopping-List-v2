@@ -1,6 +1,12 @@
 <!-- ShoppingList.vue -->
 <template>
-	<div class="container mx-auto max-w-xl mb-4 gap-4 grid">
+	<div class="container mx-auto max-w-xl mb-4 gap-2 grid">
+		<div>
+			<span class="inline-flex items-baseline">
+				<UIcon name="material-symbols:check-box-outline" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
+				<span class="text-xl font-thin">Liste</span>
+			</span>
+		</div>
 		<!-- Loading State -->
 		<div v-if="isLoading || items === null">
 			<UCard class="space-y-4 p-4">
@@ -23,17 +29,19 @@
 			</UCard>
 		</div>
 		<!-- No Items State -->
+
 		<div v-else-if="items.length === 0">
 			<p class="text-center text-gray-500 py-4">Hiç ürün bulunamadı.</p>
 		</div>
+
 		<!-- Items Loaded State -->
-		<UCard class="max-h-[45vh] overflow-auto" v-else>
-			<div>
+		<div class="max-h-[45vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto" v-else>
+			<!-- 		<div>
 				<span class="inline-flex items-baseline mb-2">
 					<UIcon name="material-symbols:check-box-outline" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
 					<span class="text-xl font-thin">Liste</span>
 				</span>
-			</div>
+			</div> -->
 
 			<!-- show items list -->
 			<div v-for="item in items" :key="item.id" class="pl-2 py-1 flex items-center justify-between cursor-pointer">
@@ -52,7 +60,7 @@
 					<span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
 				</div>
 			</div>
-		</UCard>
+		</div>
 	</div>
 </template>
 
