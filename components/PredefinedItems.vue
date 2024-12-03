@@ -68,7 +68,7 @@
 					>
 						<template #item="{ item }">
 							<div class="space-y-2">
-								<div v-for="content in item.content" :key="content.id" class="pl-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg py-1">
+								<div v-for="content in item.content" :key="content.id" class="pl-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
 									<div>
 										<span
 											class="leading-none text-md md:text-md"
