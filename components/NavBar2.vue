@@ -1,6 +1,6 @@
 <template>
 	<div class="container mx-auto max-w-xl py-2">
-		<UHorizontalNavigation :links="links" class="flex justify-center border-b border-gray-200 dark:border-gray-600" />
+		<UHorizontalNavigation :links="links" class="flex justify-center border-b border-gray-200 dark:border-gray-700" />
 	</div>
 </template>
 
