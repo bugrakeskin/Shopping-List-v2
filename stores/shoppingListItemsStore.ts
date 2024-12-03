@@ -26,15 +26,7 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
         // Verileri Supabase'den çek
         const { data, error } = await supabase
           .from("shopping_list_items")
-          .select(
-            `
-            *,
-            predefined_items (
-              name,
-              category
-            )
-          `
-          )
+          .select("*, predefined_items!inner(name, category)")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -66,31 +58,48 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
                       const { data: newItemData, error: fetchError } =
                         await supabase
                           .from("shopping_list_items")
-                          .select(
-                            `
-                          *,
-                          predefined_items (
-                            name,
-                            category
-                          )
-                        `
-                          )
+                          .select("*, predefined_items!inner(name, category)")
                           .eq("id", payload.new.id)
                           .single();
 
-                      if (!fetchError && newItemData) {
-                        const newItem: ShoppingListItem = {
-                          id: payload.new.id,
-                          created_at: payload.new.created_at,
-                          item_id: payload.new.item_id,
-                          predefined_items: payload.new.predefined_items
-                            ? {
-                                name: payload.new.predefined_items.name,
-                                category: payload.new.predefined_items.category,
-                              }
-                            : null,
-                        };
-                        this.items = this.items ? [newItem, ...this.items] : [newItem];
+                      if (!fetchError && newItemData && this.items) {
+                        // Önce aynı item_id'ye sahip bir öğe var mı kontrol et
+                        const existingIndex = this.items.findIndex(
+                          (item) => item.item_id === newItemData.item_id
+                        );
+
+                        // Eğer aynı item_id'ye sahip öğe varsa, güncelle
+                        if (existingIndex !== -1) {
+                          this.items = this.items.map((item, index) =>
+                            index === existingIndex
+                              ? {
+                                  id: newItemData.id,
+                                  created_at: newItemData.created_at,
+                                  item_id: newItemData.item_id,
+                                  predefined_items: newItemData.predefined_items
+                                    ? {
+                                        name: newItemData.predefined_items.name,
+                                        category: newItemData.predefined_items.category,
+                                      }
+                                    : null,
+                                }
+                              : item
+                          );
+                        } else {
+                          // Yoksa yeni öğe olarak ekle
+                          const newItem: ShoppingListItem = {
+                            id: newItemData.id,
+                            created_at: newItemData.created_at,
+                            item_id: newItemData.item_id,
+                            predefined_items: newItemData.predefined_items
+                              ? {
+                                  name: newItemData.predefined_items.name,
+                                  category: newItemData.predefined_items.category,
+                                }
+                              : null,
+                          };
+                          this.items = [newItem, ...this.items];
+                        }
                       }
                     }
                     break;
@@ -100,15 +109,7 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
                       const { data: updatedItemData, error: fetchError } =
                         await supabase
                           .from("shopping_list_items")
-                          .select(
-                            `
-                          *,
-                          predefined_items (
-                            name,
-                            category
-                          )
-                        `
-                          )
+                          .select("*, predefined_items!inner(name, category)")
                           .eq("id", payload.new.id)
                           .single();
 
@@ -165,23 +166,24 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
 
       try {
         // Önce item_id'ye göre kontrol edelim
-        const { data: existingItem } = await supabase
+        const { data: existingItems, error: checkError } = await supabase
           .from("shopping_list_items")
           .select()
-          .eq("item_id", item.id)
-          .single();
+          .eq("item_id", item.id);
 
         // Eğer ürün zaten varsa, eklemeyi iptal edelim
-        if (existingItem) {
+        if (existingItems && existingItems.length > 0) {
           throw new Error("Bu ürün zaten alışveriş listenizde bulunuyor.");
         }
 
         // Ürün listede yoksa ekleyelim
         const { error } = await supabase.from("shopping_list_items").insert({
-          item_id: item.id,
+          item_id: item.id
         });
 
         if (error) throw error;
+        
+        // State güncellemesini realtime subscription yapacak
       } catch (error) {
         console.error("Error adding item to shopping list:", error);
         throw error;
