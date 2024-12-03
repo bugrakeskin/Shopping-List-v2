@@ -4,7 +4,7 @@ type PredefinedItem = Database["public"]["Tables"]["predefined_items"]["Row"];
 
 export const usePredefinedItemsStore = defineStore("predefinedItems", {
   state: () => ({
-    items: [] as PredefinedItem[],
+    items: null as PredefinedItem[] | null,
     loading: false,
   }),
 
@@ -31,7 +31,7 @@ export const usePredefinedItemsStore = defineStore("predefinedItems", {
               category: item.category,
               created_at: item.created_at,
             }))
-          : [];
+          : null;
 
         // Realtime değişikliklere abone ol
         const channel = supabase
@@ -50,27 +50,35 @@ export const usePredefinedItemsStore = defineStore("predefinedItems", {
                         category: payload.new.category,
                         created_at: payload.new.created_at,
                       };
-                      this.items.unshift(newItem);
+                      if (this.items) {
+                        this.items = [newItem, ...this.items];
+                      } else {
+                        this.items = [newItem];
+                      }
                     }
                     break;
                   case "UPDATE":
-                    const index = this.items.findIndex(
-                      (item) => item.id === payload.new?.id
-                    );
-                    if (index !== -1 && payload.new) {
-                      const updatedItem: PredefinedItem = {
-                        id: payload.new.id,
-                        name: payload.new.name,
-                        category: payload.new.category,
-                        created_at: payload.new.created_at,
-                      };
-                      this.items[index] = updatedItem;
+                    if (payload.new) {
+                      const index = this.items?.findIndex(
+                        (item) => item.id === payload.new?.id
+                      );
+                      if (this.items && index !== undefined && index !== -1) {
+                        const updatedItem: PredefinedItem = {
+                          id: payload.new.id,
+                          name: payload.new.name,
+                          category: payload.new.category,
+                          created_at: payload.new.created_at,
+                        };
+                        this.items = this.items.map((item, i) =>
+                          i === index ? updatedItem : item
+                        );
+                      }
                     }
                     break;
                   case "DELETE":
-                    if (payload.old?.id) {
+                    if (payload.old?.id && this.items) {
                       this.items = this.items.filter(
-                        (item) => item.id !== payload.old.id
+                        (item) => item.id !== payload.old!.id
                       );
                     }
                     break;
@@ -81,12 +89,10 @@ export const usePredefinedItemsStore = defineStore("predefinedItems", {
             }
           );
 
-        channel.subscribe((status) => {
-          console.log("Subscription status:", status);
-        });
+        channel.subscribe();
+        this.loading = false;
       } catch (error) {
         console.error("Error fetching predefined items:", error);
-      } finally {
         this.loading = false;
       }
     },
@@ -113,7 +119,9 @@ export const usePredefinedItemsStore = defineStore("predefinedItems", {
         if (error) throw error;
 
         // Store'dan item'ı kaldır
-        this.items = this.items.filter((item) => item.id !== itemId);
+        if (this.items) {
+          this.items = this.items.filter((item) => item.id !== itemId);
+        }
       } catch (err) {
         console.error("Error deleting predefined item:", err);
         throw err; // Re-throw the error so we can handle it in the component

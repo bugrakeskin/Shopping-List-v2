@@ -2,7 +2,7 @@
 <template>
   <div class="container mx-auto max-w-xl mb-4 gap-4 grid">
     <!-- Loading State -->
-    <div v-if="isLoading">
+    <div v-if="isLoading || items === null">
       <UCard class="space-y-4 p-4">
         <!-- Header Skeleton -->
         <div class="flex items-start justify-between mb-4">

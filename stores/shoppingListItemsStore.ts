@@ -12,7 +12,7 @@ type ShoppingListItem =
 
 export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
   state: () => ({
-    items: [] as ShoppingListItem[],
+    items: null as ShoppingListItem[] | null,
     loading: false,
   }),
 
@@ -50,11 +50,8 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
                     category: item.predefined_items.category,
                   }
                 : null,
-              formattedDate: item.created_at
-                ? new Date(item.created_at).toLocaleDateString()
-                : "",
             }))
-          : [];
+          : null;
 
         const channel = supabase
           .channel("shopping_list_items")
@@ -83,22 +80,17 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
 
                       if (!fetchError && newItemData) {
                         const newItem: ShoppingListItem = {
-                          id: newItemData.id,
-                          created_at: newItemData.created_at,
-                          item_id: newItemData.item_id,
-                          predefined_items: newItemData.predefined_items
+                          id: payload.new.id,
+                          created_at: payload.new.created_at,
+                          item_id: payload.new.item_id,
+                          predefined_items: payload.new.predefined_items
                             ? {
-                                name: newItemData.predefined_items.name,
-                                category: newItemData.predefined_items.category,
+                                name: payload.new.predefined_items.name,
+                                category: payload.new.predefined_items.category,
                               }
                             : null,
-                          formattedDate: newItemData.created_at
-                            ? new Date(
-                                newItemData.created_at
-                              ).toLocaleDateString()
-                            : "",
                         };
-                        this.items.unshift(newItem);
+                        this.items = this.items ? [newItem, ...this.items] : [newItem];
                       }
                     }
                     break;
@@ -121,11 +113,11 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
                           .single();
 
                       if (!fetchError && updatedItemData) {
-                        const updateIndex = this.items.findIndex(
+                        const updateIndex = this.items?.findIndex(
                           (item) => item.id === payload.new.id
                         );
 
-                        if (updateIndex !== -1) {
+                        if (this.items && updateIndex !== undefined && updateIndex !== -1) {
                           const updatedItem: ShoppingListItem = {
                             id: updatedItemData.id,
                             created_at: updatedItemData.created_at,
@@ -133,26 +125,22 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
                             predefined_items: updatedItemData.predefined_items
                               ? {
                                   name: updatedItemData.predefined_items.name,
-                                  category:
-                                    updatedItemData.predefined_items.category,
+                                  category: updatedItemData.predefined_items.category,
                                 }
                               : null,
-                            formattedDate: updatedItemData.created_at
-                              ? new Date(
-                                  updatedItemData.created_at
-                                ).toLocaleDateString()
-                              : "",
                           };
-                          this.items[updateIndex] = updatedItem;
+                          this.items = this.items.map((item, index) =>
+                            index === updateIndex ? updatedItem : item
+                          );
                         }
                       }
                     }
                     break;
 
                   case "DELETE":
-                    if (payload.old?.id) {
+                    if (payload.old?.id && this.items) {
                       this.items = this.items.filter(
-                        (item) => item.id !== payload.old.id
+                        (item) => item.id !== payload.old!.id
                       );
                     }
                     break;
@@ -163,12 +151,10 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
             }
           );
 
-        channel.subscribe((status) => {
-          console.log("Subscription status:", status);
-        });
+        channel.subscribe();
+        this.loading = false;
       } catch (error) {
         console.error("Error fetching shopping list items:", error);
-      } finally {
         this.loading = false;
       }
     },
@@ -209,7 +195,7 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
 
       try {
         // First find the item to get its item_id
-        const item = this.items.find((item) => item.id === itemId);
+        const item = this.items?.find((item) => item.id === itemId);
         if (!item || !item.item_id) throw new Error("Item not found");
 
         // Add to purchase history
@@ -223,8 +209,8 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
 
         if (error) throw error;
 
-        // Update local state
-        this.items = this.items.filter((item) => item.id !== itemId);
+        // Update local state - use null coalescing and ensure non-null array
+        this.items = (this.items || []).filter((item) => item.id !== itemId);
       } catch (err) {
         console.error("Error deleting shopping list item:", err);
         throw err;
