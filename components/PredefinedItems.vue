@@ -63,7 +63,7 @@
 										name: item.name,
 										id: item.id,
 									})),
-									defaultOpen: openCategories.includes(category),
+									defaultOpen: searchQuery ? openCategories.includes(category) : false,
 								},
 							]"
 						>
@@ -91,18 +91,11 @@
 					</div>
 				</div>
 			</ClientOnly>
-
 			<ClientOnly>
-				<div v-if="items && items.length > 0">
-					<!-- Existing content for when items exist -->
-				</div>
-				<div v-else>
+				<div v-if="items && items.length === 0">
 					<p class="text-center text-gray-500 py-2">Hiç ürün bulunamadı.</p>
 				</div>
 			</ClientOnly>
-			<!-- 		<div class="flex items-start justify-end pt-2">
-				<UButton block square color="gray" @click="openModal" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
-			</div> -->
 		</template>
 		<!-- main div -->
 	</div>
@@ -119,6 +112,7 @@
 	const isModalOpen = ref(false);
 	const isClient = ref(false);
 	const searchQuery = ref("");
+	const openCategories = ref<string[]>([]);
 	const openModal = () => (isModalOpen.value = true);
 	const closeModal = () => (isModalOpen.value = false);
 
@@ -134,8 +128,8 @@
 		try {
 			await predefinedItemsStore.fetchAndSubscribe();
 		} catch (err) {
-			console.error('Error initializing predefined items:', err);
-			error.value = 'Failed to load items. Please try refreshing the page.';
+			console.error("Error initializing predefined items:", err);
+			error.value = "Failed to load items. Please try refreshing the page.";
 		}
 	});
 
@@ -151,7 +145,7 @@
 	});
 
 	// Computed property to track which categories should be open
-	const openCategories = computed(() => {
+	const openCategoriesComputed = computed(() => {
 		if (!searchQuery.value) return [];
 
 		return Object.entries(filteredGroupedItems.value)
@@ -183,7 +177,7 @@
 			label: `${category} ${searchQuery.value ? `(${items.length} sonuç)` : `(${items.length})`}`,
 			icon: getIconType(category),
 			content: items,
-			defaultOpen: openCategories.value.includes(category),
+			defaultOpen: openCategoriesComputed.value.includes(category),
 		}));
 	});
 
