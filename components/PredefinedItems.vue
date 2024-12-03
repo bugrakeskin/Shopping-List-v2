@@ -1,12 +1,17 @@
 <template>
 	<div>
-		<div class="flex items-start justify-between">
-			<span class="inline-flex items-baseline mb-4">
+		<div class="flex items-center justify-between">
+			<span class="inline-flex items-center">
 				<UIcon name="material-symbols:grocery-sharp" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
 				<span class="text-xl font-thin">Ürünler</span>
 			</span>
 			<div>
-				<UInput class="w-36 md:w-50" v-model="searchQuery" color="gray" size="xs" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" />
+				<UButton square color="gray" @click="openModal" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
+			</div>
+		</div>
+		<div>
+			<div class="">
+				<UInput class="w-full py-2" v-model="searchQuery" color="white" size="xs" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" />
 			</div>
 		</div>
 		<!-- skeleton loading -->
@@ -30,7 +35,7 @@
 			</UCard>
 		</div>
 		<template v-else>
-			<div class="max-h-[45vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto" v-if="items.length > 0">
+			<div class="max-h-[32vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto" v-if="items.length > 0">
 				<!-- Header -->
 
 				<!-- Grouped Catergory Items -->
@@ -88,9 +93,9 @@
 			<div v-else>
 				<p class="text-center text-gray-500 py-2">Hiç ürün bulunamadı.</p>
 			</div>
-			<div class="flex items-start justify-end pt-2">
+			<!-- 		<div class="flex items-start justify-end pt-2">
 				<UButton block square color="gray" @click="openModal" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
-			</div>
+			</div> -->
 		</template>
 		<!-- main div -->
 	</div>

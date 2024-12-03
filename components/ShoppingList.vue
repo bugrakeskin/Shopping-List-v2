@@ -35,7 +35,7 @@
 		</div>
 
 		<!-- Items Loaded State -->
-		<div class="max-h-[45vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto" v-else>
+		<div class="max-h-[52vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto" v-else>
 			<!-- 		<div>
 				<span class="inline-flex items-baseline mb-2">
 					<UIcon name="material-symbols:check-box-outline" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
