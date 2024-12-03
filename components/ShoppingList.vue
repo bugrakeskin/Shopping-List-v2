@@ -29,50 +29,72 @@
 			</UCard>
 		</div>
 		<!-- No Items State -->
-
-		<div v-else-if="items.length === 0">
+		<div v-else-if="items && items.length === 0">
 			<p class="text-center text-gray-500 py-4">Hiç ürün bulunamadı.</p>
 		</div>
 
 		<!-- Items Loaded State -->
-		<div class="max-h-[52vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto" v-else>
-			<!-- 		<div>
-				<span class="inline-flex items-baseline mb-2">
-					<UIcon name="material-symbols:check-box-outline" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
-					<span class="text-xl font-thin">Liste</span>
-				</span>
-			</div> -->
+		<ClientOnly>
+			<div v-if="items && items.length > 0" class="max-h-[52vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto">
+				<!-- show items list -->
+				<div v-for="item in items" :key="item.id" class="pl-2 py-1 flex items-center justify-between cursor-pointer">
+					<div class="flex items-center gap-2">
+						<UCheckbox class="scale-100" :modelValue="!!selectedItems[item.id]" @update:modelValue="(checked) => handleItemCheck(checked, item)" name="notifications" />
+						<span :class="{ 'line-through': selectedItems[item.id] }" class="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300" @click="() => handleItemCheck(true, item)">
+							{{ item.predefined_items?.name ?? "Unnamed Item" }}
+						</span>
+					</div>
 
-			<!-- show items list -->
-			<div v-for="item in items" :key="item.id" class="pl-2 py-1 flex items-center justify-between cursor-pointer">
-				<div class="flex items-center gap-2">
-					<UCheckbox class="scale-100" :modelValue="!!selectedItems[item.id]" @update:modelValue="(checked) => handleItemCheck(checked, item)" name="notifications" />
-					<span :class="{ 'line-through': selectedItems[item.id] }" class="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300" @click="() => handleItemCheck(true, item)">
-						{{ item.predefined_items?.name ?? "Unnamed Item" }}
-					</span>
-				</div>
-
-				<div v-if="item.predefined_items" class="flex text-gray-500 dark:text-gray-300 items-center rounded-xl px-2 py-1 space-x-1 md:space-x-2">
-					<span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
-					<UIcon :name="getIconType(item.predefined_items?.category || 'default-category')" class="" />
-				</div>
-				<div v-else class="flex text-gray-500 dark:text-gray-300 items-center">
-					<span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
+					<div v-if="item.predefined_items" class="flex text-gray-500 dark:text-gray-300 items-center rounded-xl px-2 py-1 space-x-1 md:space-x-2">
+						<span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
+						<UIcon :name="getIconType(item.predefined_items?.category || 'default-category')" class="" />
+					</div>
+					<div v-else class="flex text-gray-500 dark:text-gray-300 items-center">
+						<span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
+					</div>
 				</div>
 			</div>
-		</div>
+		</ClientOnly>
 	</div>
 </template>
 
 <script lang="ts" setup>
-	import { onMounted } from "vue";
+	import { onMounted, ref, watch } from "vue";
 
 	// State and Refs
 	const selectedItems = ref<Record<string, boolean>>({});
+	const error = ref<string | null>(null);
+	const isClient = ref(false);
 
 	// Store
 	const shoppingListItemsStore = useShoppingListItemsStore();
 	const { items, loading: isLoading } = storeToRefs(shoppingListItemsStore);
+
+	// Initialize from localStorage on client-side only
+	onMounted(async () => {
+		isClient.value = true;
+		try {
+			if (process.client) {
+				const stored = localStorage.getItem('selectedItems');
+				if (stored) {
+					selectedItems.value = JSON.parse(stored);
+				}
+			}
+			
+			// Ensure store is initialized before subscribing
+			await shoppingListItemsStore.fetchAndSubscribe();
+		} catch (err) {
+			console.error('Error initializing shopping list:', err);
+			error.value = 'Failed to initialize shopping list. Please try refreshing the page.';
+		}
+	});
+
+	// Watch selectedItems changes and update localStorage
+	watch(selectedItems, (newValue) => {
+		if (process.client && isClient.value) {
+			localStorage.setItem('selectedItems', JSON.stringify(newValue));
+		}
+	}, { deep: true });
 
 	// Format time ago function
 	const formatTimeAgo = (dateString: string) => {
@@ -115,7 +137,7 @@
 	};
 
 	// Real-time synchronization
-	onMounted(() => {
-		shoppingListItemsStore.fetchAndSubscribe(); // This ensures that data is fetched and real-time sync starts
-	});
+	// onMounted(() => {
+	// 	shoppingListItemsStore.fetchAndSubscribe(); // This ensures that data is fetched and real-time sync starts
+	// });
 </script>

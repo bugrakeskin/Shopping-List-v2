@@ -10,90 +10,107 @@ export const usePredefinedItemsStore = defineStore("predefinedItems", {
 
   actions: {
     // Verileri çek ve realtime aboneliği başlat
-    async fetchAndSubscribe() {
+    async fetchAndSubscribe(retryCount = 3, retryDelay = 1000) {
       this.loading = true;
       const supabase = useSupabaseClient<Database>();
 
-      try {
-        // Verileri Supabase'den çek
-        const { data, error } = await supabase
-          .from("predefined_items")
-          .select("*")
-          .order("created_at", { ascending: false });
+      for (let attempt = 1; attempt <= retryCount; attempt++) {
+        try {
+          // Verileri Supabase'den çek
+          const { data, error } = await supabase
+            .from("predefined_items")
+            .select("*")
+            .order("created_at", { ascending: false });
 
-        if (error) throw error;
+          if (error) throw error;
 
-        // Güvenli veri dönüşümü
-        this.items = Array.isArray(data)
-          ? data.map((item) => ({
-              id: item.id,
-              name: item.name,
-              category: item.category,
-              created_at: item.created_at,
-            }))
-          : null;
+          // Güvenli veri dönüşümü
+          this.items = Array.isArray(data)
+            ? data.map((item) => ({
+                id: item.id,
+                name: item.name,
+                category: item.category,
+                created_at: item.created_at,
+              }))
+            : null;
 
-        // Realtime değişikliklere abone ol
-        const channel = supabase
-          .channel("predefined_items")
-          .on(
-            "postgres_changes",
-            { event: "*", schema: "public", table: "predefined_items" },
-            async (payload) => {
-              try {
-                switch (payload.eventType) {
-                  case "INSERT":
-                    if (payload.new) {
-                      const newItem: PredefinedItem = {
-                        id: payload.new.id,
-                        name: payload.new.name,
-                        category: payload.new.category,
-                        created_at: payload.new.created_at,
-                      };
-                      if (this.items) {
-                        this.items = [newItem, ...this.items];
-                      } else {
-                        this.items = [newItem];
-                      }
-                    }
-                    break;
-                  case "UPDATE":
-                    if (payload.new) {
-                      const index = this.items?.findIndex(
-                        (item) => item.id === payload.new?.id
-                      );
-                      if (this.items && index !== undefined && index !== -1) {
-                        const updatedItem: PredefinedItem = {
+          // Realtime değişikliklere abone ol
+          const channel = supabase
+            .channel("predefined_items")
+            .on(
+              "postgres_changes",
+              { event: "*", schema: "public", table: "predefined_items" },
+              async (payload) => {
+                try {
+                  switch (payload.eventType) {
+                    case "INSERT":
+                      if (payload.new) {
+                        const newItem: PredefinedItem = {
                           id: payload.new.id,
                           name: payload.new.name,
                           category: payload.new.category,
                           created_at: payload.new.created_at,
                         };
-                        this.items = this.items.map((item, i) =>
-                          i === index ? updatedItem : item
+                        if (this.items) {
+                          this.items = [newItem, ...this.items];
+                        } else {
+                          this.items = [newItem];
+                        }
+                      }
+                      break;
+                    case "UPDATE":
+                      if (payload.new) {
+                        const index = this.items?.findIndex(
+                          (item) => item.id === payload.new?.id
+                        );
+                        if (this.items && index !== undefined && index !== -1) {
+                          const updatedItem: PredefinedItem = {
+                            id: payload.new.id,
+                            name: payload.new.name,
+                            category: payload.new.category,
+                            created_at: payload.new.created_at,
+                          };
+                          this.items = this.items.map((item, i) =>
+                            i === index ? updatedItem : item
+                          );
+                        }
+                      }
+                      break;
+                    case "DELETE":
+                      if (payload.old?.id && this.items) {
+                        this.items = this.items.filter(
+                          (item) => item.id !== payload.old!.id
                         );
                       }
-                    }
-                    break;
-                  case "DELETE":
-                    if (payload.old?.id && this.items) {
-                      this.items = this.items.filter(
-                        (item) => item.id !== payload.old!.id
-                      );
-                    }
-                    break;
+                      break;
+                  }
+                } catch (error) {
+                  console.error("Real-time update error:", error);
                 }
-              } catch (error) {
-                console.error("Real-time update error:", error);
               }
-            }
-          );
+            );
 
-        channel.subscribe();
-        this.loading = false;
-      } catch (error) {
-        console.error("Error fetching predefined items:", error);
-        this.loading = false;
+          channel.subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              this.loading = false;
+            }
+          });
+
+          // If we reach here, everything worked
+          return;
+
+        } catch (error) {
+          console.error(`Attempt ${attempt} failed:`, error);
+          
+          // If this was our last attempt, throw the error
+          if (attempt === retryCount) {
+            this.loading = false;
+            throw new Error(`Failed to fetch predefined items after ${retryCount} attempts: ${error}`);
+          }
+          
+          // Otherwise wait and try again
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
       }
     },
 

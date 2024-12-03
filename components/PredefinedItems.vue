@@ -35,12 +35,13 @@
 			</UCard>
 		</div>
 		<template v-else>
-			<div class="max-h-[32vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto" v-if="items.length > 0">
-				<!-- Header -->
+			<ClientOnly>
+				<div v-if="items && items.length > 0" class="max-h-[32vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto">
+					<!-- Header -->
 
-				<!-- Grouped Catergory Items -->
-				<div v-for="(items, category) in filteredGroupedItems" :key="category">
-					<!--        <UDivider
+					<!-- Grouped Catergory Items -->
+					<div v-for="(items, category) in filteredGroupedItems" :key="category">
+						<!--        <UDivider
           class="pl-2"
           :ui="{ border: { base: 'border-gray-200 dark:border-gray-800' } }"
         >
@@ -51,48 +52,54 @@
           </div>
         </UDivider> -->
 
-					<UAccordion
-						color="gray"
-						variant="ghost"
-						:items="[
-							{
-								label: `${category} ${searchQuery ? `(${items.length} sonuç)` : `(${items.length})`}`,
-								icon: getIconType(category),
-								content: items.map((item) => ({
-									name: item.name,
-									id: item.id,
-								})),
-								defaultOpen: openCategories.includes(category),
-							},
-						]"
-					>
-						<template #item="{ item }">
-							<div class="space-y-2">
-								<div v-for="content in item.content" :key="content.id" class="pl-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
-									<div>
-										<span
-											class="leading-none text-md md:text-md"
-											:class="{
-												'bg-yellow-100 dark:bg-yellow-800/50': searchQuery && content.name.toLowerCase().includes(searchQuery.toLowerCase()),
-											}"
-										>
-											{{ content.name }}
-										</span>
-									</div>
-									<div class="flex">
-										<UButton size="xl" class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1" variant="soft" icon="solar:cart-plus-outline" @click="addItemToShoppingList(content)" />
-										<UButton size="xl" class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1" variant="soft" icon="solar:trash-bin-minimalistic-outline" @click="deleteFromPredefinedItems(content)" />
+						<UAccordion
+							color="gray"
+							variant="ghost"
+							:items="[
+								{
+									label: `${category} ${searchQuery ? `(${items.length} sonuç)` : `(${items.length})`}`,
+									icon: getIconType(category),
+									content: items.map((item) => ({
+										name: item.name,
+										id: item.id,
+									})),
+									defaultOpen: openCategories.includes(category),
+								},
+							]"
+						>
+							<template #item="{ item }">
+								<div class="space-y-2">
+									<div v-for="content in item.content" :key="content.id" class="pl-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
+										<div>
+											<span
+												class="leading-none text-md md:text-md"
+												:class="{
+													'bg-yellow-100 dark:bg-yellow-800/50': searchQuery && content.name.toLowerCase().includes(searchQuery.toLowerCase()),
+												}"
+											>
+												{{ content.name }}
+											</span>
+										</div>
+										<div class="flex">
+											<UButton size="xl" class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1" variant="soft" icon="solar:cart-plus-outline" @click="addItemToShoppingList(content)" />
+											<UButton size="xl" class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1" variant="soft" icon="solar:trash-bin-minimalistic-outline" @click="deleteFromPredefinedItems(content)" />
+										</div>
 									</div>
 								</div>
-							</div>
-						</template>
-					</UAccordion>
+							</template>
+						</UAccordion>
+					</div>
 				</div>
-			</div>
+			</ClientOnly>
 
-			<div v-else>
-				<p class="text-center text-gray-500 py-2">Hiç ürün bulunamadı.</p>
-			</div>
+			<ClientOnly>
+				<div v-if="items && items.length > 0">
+					<!-- Existing content for when items exist -->
+				</div>
+				<div v-else>
+					<p class="text-center text-gray-500 py-2">Hiç ürün bulunamadı.</p>
+				</div>
+			</ClientOnly>
 			<!-- 		<div class="flex items-start justify-end pt-2">
 				<UButton block square color="gray" @click="openModal" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
 			</div> -->
@@ -110,6 +117,7 @@
 	import { getIconType } from "~/composables/useGetIconType";
 
 	const isModalOpen = ref(false);
+	const isClient = ref(false);
 	const searchQuery = ref("");
 	const openModal = () => (isModalOpen.value = true);
 	const closeModal = () => (isModalOpen.value = false);
@@ -118,6 +126,18 @@
 	const predefinedItemsStore = usePredefinedItemsStore();
 	const shoppingListStore = useShoppingListItemsStore();
 	const { items, loading: isLoading } = storeToRefs(predefinedItemsStore);
+	const error = ref<string | null>(null);
+
+	// Mounted hook
+	onMounted(async () => {
+		isClient.value = true;
+		try {
+			await predefinedItemsStore.fetchAndSubscribe();
+		} catch (err) {
+			console.error('Error initializing predefined items:', err);
+			error.value = 'Failed to load items. Please try refreshing the page.';
+		}
+	});
 
 	// Group items by category
 	const groupedItems = computed(() => {
@@ -205,11 +225,6 @@
 			console.error("Failed to add item to shopping list:", error);
 		}
 	};
-
-	// Mounted hook
-	onMounted(() => {
-		predefinedItemsStore.fetchAndSubscribe();
-	});
 </script>
 
 <style></style>
