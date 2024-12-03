@@ -32,19 +32,35 @@ export const useShoppingListItemsStore = defineStore("ShoppingListItems", {
 
           if (error) throw error;
 
-          this.items = Array.isArray(data)
-            ? data.map((item) => ({
+          // Veri tipini ve yapısını kontrol et
+          if (!Array.isArray(data)) {
+            console.error("Unexpected data format:", data);
+            this.items = null;
+            return;
+          }
+
+          try {
+            this.items = data.map((item) => {
+              if (!item || typeof item !== 'object') {
+                throw new Error(`Invalid item format: ${JSON.stringify(item)}`);
+              }
+
+              return {
                 id: item.id,
                 created_at: item.created_at,
                 item_id: item.item_id,
-                predefined_items: item.predefined_items
+                predefined_items: item.predefined_items && typeof item.predefined_items === 'object'
                   ? {
-                      name: item.predefined_items.name,
-                      category: item.predefined_items.category,
+                      name: item.predefined_items.name ?? null,
+                      category: item.predefined_items.category ?? null,
                     }
                   : null,
-              }))
-            : null;
+              };
+            });
+          } catch (err) {
+            console.error("Error processing items data:", err);
+            this.items = null;
+          }
 
           const channel = supabase
             .channel("shopping_list_items")
