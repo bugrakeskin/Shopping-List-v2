@@ -66,6 +66,7 @@
         </UDivider> -->
 
         <UAccordion
+          color="gray"
           variant="ghost"
           :items="[
             {

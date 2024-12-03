@@ -29,10 +29,10 @@
           </UFormGroup>
 
           <UFormGroup label="Ürün Tipi" name="category">
-            <USelectMenu 
-              placeholder="Ürün Tipini Seçin" 
-              v-model="formState.category" 
-              :options="['Gıda', 'Temizlik', 'Kişisel Bakım']" 
+            <USelectMenu
+              placeholder="Ürün Tipini Seçin"
+              v-model="formState.category"
+              :options="['Gıda', 'Temizlik', 'Kişisel Bakım', 'İçecek']"
             />
           </UFormGroup>
 
@@ -60,18 +60,18 @@
 </template>
 
 <script lang="ts" setup>
-import { usePredefinedItemsStore } from '~/stores/predefinedItemsStore';
+import { usePredefinedItemsStore } from "~/stores/predefinedItemsStore";
 
 const predefinedItemsStore = usePredefinedItemsStore();
 
 const formState = ref({
-  name: '',
-  category: '',
+  name: "",
+  category: "",
 });
 
 const loading = ref(false);
 const showSuccessMessage = ref(false);
-const errorMessage = ref('');
+const errorMessage = ref("");
 
 const props = defineProps({
   isOpen: Boolean,
@@ -82,22 +82,22 @@ const emit = defineEmits(["close"]);
 const closeModal = () => {
   // Reset form state
   formState.value = {
-    name: '',
-    category: '',
+    name: "",
+    category: "",
   };
   showSuccessMessage.value = false;
-  errorMessage.value = '';
+  errorMessage.value = "";
   emit("close");
 };
 
 const handleSubmit = async () => {
   if (!formState.value.name || !formState.value.category) {
-    errorMessage.value = 'Lütfen tüm alanları doldurun';
+    errorMessage.value = "Lütfen tüm alanları doldurun";
     return;
   }
 
   loading.value = true;
-  errorMessage.value = '';
+  errorMessage.value = "";
   showSuccessMessage.value = false;
 
   try {
@@ -112,8 +112,8 @@ const handleSubmit = async () => {
       showSuccessMessage.value = true;
       // Reset form after successful submission
       formState.value = {
-        name: '',
-        category: '',
+        name: "",
+        category: "",
       };
       // Close modal after a short delay
       setTimeout(() => {
@@ -121,7 +121,7 @@ const handleSubmit = async () => {
       }, 1500);
     }
   } catch (error) {
-    errorMessage.value = 'Bir hata oluştu';
+    errorMessage.value = "Bir hata oluştu";
   } finally {
     loading.value = false;
   }
