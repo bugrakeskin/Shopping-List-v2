@@ -1,26 +1,27 @@
 <template>
-  <nav>
-    <div class="w-full flex justify-center mb-6 rounded-xl">
-      <UButtonGroup class="w-full flex items-center justify-center">
-        <UButton
-          class="flex-1 flex items-center justify-center h-12  md:text-xl"
-          icon="material-symbols:list-alt-check-outline-rounded"
-          color="gray"
-          variant="solid"
-          label="Ana Sayfa"
-        />
-        <UButton
-          class="flex-1 flex items-center justify-center h-12 md:text-xl"
-          icon="ic:round-history"
-          color="gray"
-          variant="solid"
-          label="Geçmiş"
-        />
-      </UButtonGroup>
-    </div>
-  </nav>
+  <div class="container mx-auto max-w-xl px-4 pt-2">
+    <UHorizontalNavigation
+      :links="links"
+      :ui="{
+        active: 'text-gray-900 dark:text-white after:bg-amber-400 dark:after:bg-amber-500 after:rounded-full',
+      }"
+      class="flex justify-center"
+    />
+  </div>
 </template>
 
-<script lang="ts" setup></script>
+<script setup lang="ts">
+const links = [
+  {
+    label: "Alışveriş Listesi",
+    icon: "material-symbols:list-alt-check-outline-rounded",
 
-<style></style>
+    to: "/",
+  },
+  {
+    label: "Geçmiş",
+    icon: "i-heroicons-chart-bar",
+    to: "/history",
+  },
+];
+</script>
