@@ -1,39 +1,22 @@
 <template>
-	<div>
-		<div class="flex items-center justify-between">
+	<div class="p-2">
+		<div class="flex items-start justify-between">
 			<span class="inline-flex items-center">
 				<UIcon name="material-symbols:grocery-sharp" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
 				<span class="text-xl font-thin">Ürünler</span>
 			</span>
 			<div>
-				<UButton square color="gray" @click="openModal" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
+				<UButton square color="lime" @click="openModal" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
 			</div>
 		</div>
 		<div>
 			<div class="">
-				<UInput class="w-full py-2" v-model="searchQuery" color="white" size="xs" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" />
+				<UInput class="w-full py-2" v-model="searchQuery" color="white" size="sm" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" />
 			</div>
 		</div>
-		<!-- skeleton loading -->
-		<div v-if="isLoading || items === null">
-			<UCard class="space-y-4 p-2">
-				<div class="flex items-start justify-between pb-6">
-					<div class="grid space-y-2">
-						<USkeleton class="h-10 w-10 rounded-full" />
-						<USkeleton class="h-4 w-16" />
-					</div>
-					<USkeleton class="h-8 w-24 rounded" />
-				</div>
-
-				<div class="space-y-3">
-					<div v-for="i in 3" :key="i" class="flex items-center justify-between">
-						<USkeleton class="h-6 w-6 rounded-full" />
-						<USkeleton class="h-4 w-[70%]" />
-						<USkeleton class="h-4 w-12" />
-					</div>
-				</div>
-			</UCard>
-		</div>
+		<template v-if="isLoading || items === null">
+			<!-- skeleton loading removed -->
+		</template>
 		<template v-else>
 			<ClientOnly>
 				<div v-if="items && items.length > 0" class="max-h-[32vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto">

@@ -27,7 +27,7 @@
 						<USelectMenu placeholder="Ürün Tipini Seçin" v-model="formState.category" :options="['Gıda', 'Temizlik', 'Kişisel Bakım', 'İçecek']" />
 					</UFormGroup>
 
-					<UButton variant="solid" color="gray" size="sm" block type="submit" :loading="loading">Kaydet</UButton>
+					<UButton variant="solid" color="lime" size="md" block type="submit" :loading="loading">Kaydet</UButton>
 				</UForm>
 
 				<!-- Feedback Messages -->

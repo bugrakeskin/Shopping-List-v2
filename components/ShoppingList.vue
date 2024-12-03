@@ -1,35 +1,14 @@
 <!-- ShoppingList.vue -->
 <template>
-	<div class="container mx-auto max-w-xl mb-4 gap-2 grid">
+	<div class="container mx-auto max-w-xl mb-4 gap-2 grid p-2">
 		<div>
 			<span class="inline-flex items-baseline">
 				<UIcon name="material-symbols:check-box-outline" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
 				<span class="text-xl font-thin">Liste</span>
 			</span>
 		</div>
-		<!-- Loading State -->
-		<div v-if="isLoading || items === null">
-			<UCard class="space-y-4 p-4">
-				<!-- Header Skeleton -->
-				<div class="flex items-start justify-between mb-4">
-					<div class="grid space-y-2">
-						<USkeleton class="h-10 w-10 rounded-full" />
-						<USkeleton class="h-4 w-16" />
-					</div>
-				</div>
-
-				<!-- Items Skeleton -->
-				<div class="space-y-3">
-					<div v-for="i in 3" :key="i" class="flex items-center justify-between">
-						<USkeleton class="h-6 w-6 rounded-full" />
-						<USkeleton class="h-4 w-[70%]" />
-						<USkeleton class="h-4 w-12" />
-					</div>
-				</div>
-			</UCard>
-		</div>
 		<!-- No Items State -->
-		<div v-else-if="items && items.length === 0">
+		<div v-if="items && items.length === 0">
 			<p class="text-center text-gray-500 py-4">Hiç ürün bulunamadı.</p>
 		</div>
 
@@ -75,26 +54,30 @@
 		isClient.value = true;
 		try {
 			if (process.client) {
-				const stored = localStorage.getItem('selectedItems');
+				const stored = localStorage.getItem("selectedItems");
 				if (stored) {
 					selectedItems.value = JSON.parse(stored);
 				}
 			}
-			
+
 			// Ensure store is initialized before subscribing
 			await shoppingListItemsStore.fetchAndSubscribe();
 		} catch (err) {
-			console.error('Error initializing shopping list:', err);
-			error.value = 'Failed to initialize shopping list. Please try refreshing the page.';
+			console.error("Error initializing shopping list:", err);
+			error.value = "Failed to initialize shopping list. Please try refreshing the page.";
 		}
 	});
 
 	// Watch selectedItems changes and update localStorage
-	watch(selectedItems, (newValue) => {
-		if (process.client && isClient.value) {
-			localStorage.setItem('selectedItems', JSON.stringify(newValue));
-		}
-	}, { deep: true });
+	watch(
+		selectedItems,
+		(newValue) => {
+			if (process.client && isClient.value) {
+				localStorage.setItem("selectedItems", JSON.stringify(newValue));
+			}
+		},
+		{ deep: true }
+	);
 
 	// Format time ago function
 	const formatTimeAgo = (dateString: string) => {
