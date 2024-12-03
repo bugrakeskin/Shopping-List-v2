@@ -3,7 +3,7 @@
 		<!-- skeleton loading -->
 		<div v-if="isLoading || items === null">
 			<UCard class="space-y-4 p-2">
-				<div class="flex items-start justify-between mb-6">
+				<div class="flex items-start justify-between pb-6">
 					<div class="grid space-y-2">
 						<USkeleton class="h-10 w-10 rounded-full" />
 						<USkeleton class="h-4 w-16" />
@@ -21,7 +21,7 @@
 			</UCard>
 		</div>
 		<template v-else>
-			<UCard v-if="items.length > 0">
+			<UCard class="max-h-[40vh] overflow-auto" v-if="items.length > 0">
 				<!-- Header -->
 
 				<div class="flex items-start justify-between">
@@ -84,7 +84,7 @@
 						</template>
 					</UAccordion>
 				</div>
-				<div class="flex items-start justify-end mt-4">
+				<div class="flex items-start justify-end pt-2">
 					<UButton block square color="gray" @click="openModal" variant="solid" size="xs" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
 				</div>
 			</UCard>
