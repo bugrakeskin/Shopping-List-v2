@@ -1,5 +1,14 @@
 <template>
 	<div>
+		<div class="flex items-start justify-between">
+			<span class="inline-flex items-baseline mb-4">
+				<UIcon name="material-symbols:grocery-sharp" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
+				<span class="text-xl font-thin">Ürünler</span>
+			</span>
+			<div>
+				<UInput class="w-36 md:w-50" v-model="searchQuery" color="gray" size="xs" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" />
+			</div>
+		</div>
 		<!-- skeleton loading -->
 		<div v-if="isLoading || items === null">
 			<UCard class="space-y-4 p-2">
@@ -21,18 +30,8 @@
 			</UCard>
 		</div>
 		<template v-else>
-			<UCard class="max-h-[45vh] overflow-auto" v-if="items.length > 0">
+			<div class="max-h-[45vh] border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto" v-if="items.length > 0">
 				<!-- Header -->
-
-				<div class="flex items-start justify-between">
-					<span class="inline-flex items-baseline mb-4">
-						<UIcon name="material-symbols:grocery-sharp" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
-						<span class="text-xl font-thin">Ürünler</span>
-					</span>
-					<div>
-						<UInput class="w-36 md:w-50" v-model="searchQuery" color="gray" size="xs" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" />
-					</div>
-				</div>
 
 				<!-- Grouped Catergory Items -->
 				<div v-for="(items, category) in filteredGroupedItems" :key="category">
@@ -84,7 +83,7 @@
 						</template>
 					</UAccordion>
 				</div>
-			</UCard>
+			</div>
 
 			<div v-else>
 				<p class="text-center text-gray-500 py-2">Hiç ürün bulunamadı.</p>
