@@ -1,49 +1,41 @@
 <template>
-  <div class="container mx-auto px-4 py-4">
-    <div class="-ml-2">
-      <div class="flex items-start rounded-md transition duration-500">
-        <div class="w-14 p-2 shrink-0">
-          <UIcon name="material-symbols-light:history" class="h-12 w-12 text-amber-500" />
-        </div>
-        <div class="p-2">
-          <p class="font-semibold text-lg">Geçmiş</p>
-          <span class="text-amber-400 dark:text-amber-500 text-sm">Satın alınan ürünler </span>
-        </div>
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 sm:p-6">
+    <!-- Header -->
+    <div class="flex items-center space-x-4 mb-6">
+      <UIcon name="material-symbols-light:history" class="h-8 w-8 sm:h-10 sm:w-10 text-amber-500" />
+      <div>
+        <h2 class="text-lg sm:text-xl font-semibold">Geçmiş</h2>
+        <span class="text-amber-400 dark:text-amber-500 text-sm">Satın alınan ürünler</span>
       </div>
     </div>
-    <div v-if="purchaseHistoryStore.loading" class="flex justify-center items-center py-8">
-      <!--       <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
- -->
-      <div class="w-12 h-12 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
-      <div class="text-amber-500 font-medium">Yükleniyor</div>
+
+    <!-- Loading State -->
+    <div v-if="purchaseHistoryStore.loading" class="flex items-center justify-center gap-3 py-8">
+      <div class="w-8 h-8 border-3 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
+      <span class="text-amber-500 text-sm font-medium">Yükleniyor...</span>
     </div>
 
-    <div v-else-if="purchaseHistoryStore.items.length === 0" class="text-center py-8 text-gray-500">Henüz geçmiş kayıt bulunmuyor</div>
+    <!-- Empty State -->
+    <div v-else-if="purchaseHistoryStore.items.length === 0" class="text-center py-12">
+      <UIcon name="material-symbols:history" class="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
+      <p class="text-gray-500 dark:text-gray-400">Henüz geçmiş kayıt bulunmuyor</p>
+    </div>
 
-    <div v-else class="grid gap-4 max-h-[calc(100vh-12rem)] overflow-auto p-2">
-      <!-- <div>
-				<span class="inline-flex items-baseline mb-2">
-					<UIcon name="ic:round-history" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
-					<span class="text-xl font-thin">Geçmiş</span>
-				</span>
-			</div> -->
-
-      <div class="overflow-y-auto">
-        <div v-for="item in purchaseHistoryStore.items" :key="item.id" class="rounded-lg p-2 flex items-center justify-between">
-          <div>
-            <h3 class="font-medium">{{ item.item_name || "Silinmiş Ürün" }}</h3>
+    <!-- Items List -->
+    <div v-else class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+      <div class="max-h-[calc(100vh-16rem)] md:max-h-[calc(100vh-20rem)] overflow-auto">
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+          <div v-for="item in purchaseHistoryStore.items" :key="item.id" class="p-3 sm:p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+            <div class="flex items-center gap-3">
+              <UIcon name="material-symbols:check-circle-outline" class="h-5 w-5 text-green-500 dark:text-green-400 flex-shrink-0" />
+              <span class="text-gray-900 dark:text-gray-100 text-sm sm:text-base">
+                {{ item.item_name || "Silinmiş Ürün" }}
+              </span>
+            </div>
+            <time :datetime="item.created_at" class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+              {{ formatDate(item.created_at) }}
+            </time>
           </div>
-          <p class="text-xs text-gray-500 dark:text-gray-300">
-            {{
-              new Date(item.created_at).toLocaleDateString("tr-TR", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            }}
-          </p>
         </div>
       </div>
     </div>
@@ -55,6 +47,17 @@ import { usePurchaseHistoryStore } from "~/stores/purchaseHistoryStore";
 import { onMounted } from "vue";
 
 const purchaseHistoryStore = usePurchaseHistoryStore();
+
+// Format date helper
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("tr-TR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 // Fetch items when component mounts
 onMounted(() => {

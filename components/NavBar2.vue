@@ -4,7 +4,7 @@
       <div class="container flex flex-wrap items-center justify-between mx-auto text-slate-800 dark:text-gray-100">
         <div class="inline-flex items-center justify-between w-auto">
           <span class="text-amber-500 dark:text-amber-400 text-base font-mono">[MB]</span>
-          <a href="#" class="block cursor-pointer py-1.5 text-base text-slate-800 dark:text-gray-100 font-light ml-2">Shopping List</a>
+          <a href="/" class="block cursor-pointer py-1.5 text-base text-slate-800 dark:text-gray-100 font-light ml-2">Shopping List</a>
         </div>
         <div class="hidden lg:block">
           <ul class="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
