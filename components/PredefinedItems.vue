@@ -1,50 +1,51 @@
 <template>
-  <div class="p-2">
-    <div class="-ml-2">
-      <div class="flex items-start rounded-md transition duration-500">
-        <div class="w-14 p-2 shrink-0">
-          <UIcon name="material-symbols-light:grocery" class="h-12 w-12 text-amber-500" />
-        </div>
-        <div class="p-2">
-          <p class="font-semibold text-lg">Ürünler</p>
-          <span class="text-amber-400 dark:text-amber-500 text-sm">Toplam Ürün ({{ items?.length || 0 }})</span>
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 sm:p-6 mt-6">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center space-x-4">
+        <UIcon name="material-symbols-light:grocery" class="h-8 w-8 sm:h-10 sm:w-10 text-amber-500" />
+        <div>
+          <h2 class="text-lg sm:text-xl font-semibold">Ürünler</h2>
+          <span class="text-amber-400 dark:text-amber-500 text-sm"> Toplam Ürün ({{ items?.length || 0 }}) </span>
         </div>
       </div>
+      <UButton color="amber" @click="isModalOpen = true" variant="solid" size="sm" class="hidden sm:flex" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
     </div>
 
-    <div class="py-1 flex justify-end items-center">
-      <UButton block square color="amber" @click="isModalOpen = true" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
-    </div>
+    <div class="space-y-4">
+      <UInput v-model="searchQuery" color="white" size="md" class="w-full" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" />
 
-    <UInput class="w-full py-2" v-model="searchQuery" color="white" size="sm" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" />
+      <div class="sm:hidden">
+        <UButton block color="amber" @click="isModalOpen = true" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
+      </div>
 
-    <ClientOnly>
-      <div v-if="!isLoading && items">
-        <div v-if="items.length" class="border border-gray dark:border-gray-700 p-2 rounded-xl overflow-auto">
-          <UAccordion v-for="(section, idx) in processedItems" :key="idx" color="white" variant="solid" :items="[section]">
-            <template #item="{ item }">
-              <div class="space-y-2 pl-2">
-                <div v-for="content in item.content" :key="content.id" class="pl-2 flex items-center justify-between rounded-lg">
-                  <span
-                    class="text-gray-800 dark:text-white font-light"
-                    :class="{
-                      'bg-yellow-100 dark:bg-yellow-800/50 ': searchQuery && content.name.toLowerCase().includes(searchQuery.toLowerCase()),
-                    }"
-                  >
-                    {{ content.name }}
-                  </span>
-                  <div class="flex">
-                    <UButton square color="amber" size="xl" class="border-0 p-1 mr-2 tap-button" variant="solid" icon="solar:cart-plus-outline" @click="addItemToShoppingList(content)" />
-                    <UButton square color="red" size="xl" class="border-0 p-1 tap-button" variant="solid" icon="solar:trash-bin-minimalistic-outline" @click="deleteFromPredefinedItems(content)" />
+      <ClientOnly>
+        <div v-if="!isLoading && items">
+          <div v-if="items.length" class="px-1 rounded-xl overflow-hidden">
+            <UAccordion v-for="(section, idx) in processedItems" :key="idx" color="white" variant="solid" :items="[section]" class="[&>:not(:last-child)]:border-b dark:border-gray-700">
+              <template #item="{ item }">
+                <div class="space-y-3 py-2">
+                  <div v-for="content in item.content" :key="content.id" class="px-4 flex items-center justify-between py-2 transition-colors rounded-lg">
+                    <span
+                      class="text-gray-800 dark:text-white text-sm sm:text-base"
+                      :class="{
+                        'bg-yellow-100 dark:bg-yellow-800/50': searchQuery && content.name.toLowerCase().includes(searchQuery.toLowerCase()),
+                      }"
+                    >
+                      {{ content.name }}
+                    </span>
+                    <div class="flex space-x-2">
+                      <UButton square color="amber" size="sm" class="tap-button" variant="solid" icon="solar:cart-plus-outline" @click="addItemToShoppingList(content)" />
+                      <UButton square color="red" size="sm" class="tap-button" variant="solid" icon="solar:trash-bin-minimalistic-outline" @click="deleteFromPredefinedItems(content)" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </template>
-          </UAccordion>
+              </template>
+            </UAccordion>
+          </div>
+          <p v-else class="text-center text-gray-500 dark:text-gray-400 py-8">Hiç ürün bulunamadı.</p>
         </div>
-        <p v-else class="text-center text-gray-500 py-2">Hiç ürün bulunamadı.</p>
-      </div>
-    </ClientOnly>
+      </ClientOnly>
+    </div>
   </div>
   <AddPredefinedItemsModal :isOpen="isModalOpen" @close="isModalOpen = false" />
 </template>

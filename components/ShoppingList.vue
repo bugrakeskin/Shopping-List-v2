@@ -1,58 +1,42 @@
 <!-- ShoppingList.vue -->
 <template>
-  <div class="gap-1 grid pt-2 px-2">
-    <div class="-ml-3">
-      <div class="flex items-start rounded-md transition duration-500">
-        <div class="w-14 p-2 shrink-0">
-          <UIcon name="material-symbols-light:select-check-box" class="h-12 w-12 text-amber-500" />
-        </div>
-        <div class="p-2">
-          <p class="font-semibold text-lg">Liste</p>
-          <span class="text-amber-400 dark:text-amber-500 text-sm">({{ items?.length || 0 }}) adet ürün listede</span>
-        </div>
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 sm:p-6">
+    <div class="flex items-center space-x-4 mb-6">
+      <UIcon name="material-symbols-light:select-check-box" class="h-8 w-8 sm:h-10 sm:w-10 text-amber-500" />
+      <div>
+        <h2 class="text-lg sm:text-xl font-semibold">Liste</h2>
+        <span class="text-amber-400 dark:text-amber-500 text-sm"> ({{ items?.length || 0 }}) adet ürün listede </span>
       </div>
     </div>
 
     <!-- No Items State -->
-    <div v-if="items && items.length === 0">
-      <p class="text-center text-gray-500 py-4">Hiç ürün bulunamadı.</p>
+    <div v-if="items && items.length === 0" class="text-center py-8">
+      <p class="text-gray-500 dark:text-gray-400">Hiç ürün bulunamadı.</p>
     </div>
 
     <!-- Items Loaded State -->
     <ClientOnly>
-      <div v-if="items && items.length > 0" class="max-h-[32vh] border border-gray dark:border-gray-700 font-light p-1 rounded-xl overflow-auto">
-        <!-- show items list -->
-        <div v-for="item in items" :key="item.id" class="pl-2 py-1 flex items-center justify-between cursor-pointer">
-          <div class="flex items-center gap-2">
-            <UCheckbox class="scale-100" :modelValue="!!selectedItems[item.id]" @update:modelValue="(checked) => handleItemCheck(checked, item)" name="notifications" />
-            <span :class="{ 'line-through': selectedItems[item.id] }" class="cursor-pointer hover:text-gray-600 dark:hover:text-gray-300" @click="() => handleItemCheck(true, item)">
-              {{ item.predefined_items?.name ?? "Unnamed Item" }}
-            </span>
-          </div>
+      <div v-if="items && items.length > 0" class="max-h-[43vh] sm:max-h-[50vh] border border-gray-200 dark:border-gray-700 rounded-xl overflow-auto">
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+          <div v-for="item in items" :key="item.id" class="p-3 sm:p-4 flex items-center justify-between transition-colors">
+            <div class="flex items-center gap-3">
+              <UCheckbox class="scale-100" :modelValue="!!selectedItems[item.id]" @update:modelValue="(checked) => handleItemCheck(checked, item)" name="notifications" />
+              <span :class="{ 'line-through text-gray-400': selectedItems[item.id] }" class="cursor-pointer text-sm sm:text-base" @click="() => handleItemCheck(true, item)">
+                {{ item.predefined_items?.name ?? "Unnamed Item" }}
+              </span>
+            </div>
 
-          <div v-if="item.predefined_items" class="flex text-gray-500 dark:text-gray-300 items-center rounded-xl px-2 py-1 space-x-1 md:space-x-2">
-            <span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
-            <UIcon :name="getIconType(item.predefined_items?.category || 'default-category')" class="" />
-          </div>
-          <div v-else class="flex text-gray-500 dark:text-gray-300 items-center">
-            <span class="text-xs font-light">{{ formatTimeAgo(item.created_at) }}</span>
+            <div class="flex items-center space-x-2 sm:space-x-3">
+              <span class="text-xs text-gray-500 dark:text-gray-400">
+                {{ formatTimeAgo(item.created_at) }}
+              </span>
+              <UIcon v-if="item.predefined_items" :name="getIconType(item.predefined_items?.category || 'default-category')" class="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            </div>
           </div>
         </div>
       </div>
     </ClientOnly>
   </div>
-
-  <!--   <div class="p-2">
-    <div class="flex items-center rounded-md transition duration-500">
-      <div class="w-16 p-2 shrink-0">
-        <UIcon name="material-symbols:check-box-outline" class="h-12 w-12 text-green-300" />
-      </div>
-      <div class="p-2">
-        <p class="font-semibold text-lg">Liste</p>
-        <span class="text-gray-300">Alışveriş listesindeki ürünler</span>
-      </div>
-    </div>
-  </div> -->
 </template>
 
 <script lang="ts" setup>
@@ -79,7 +63,7 @@ const safeLocalStorage = {
       console.debug(`[SafeLocalStorage] Getting ${key}:`, value);
       return value;
     } catch (e) {
-      console.error('[SafeLocalStorage] Error reading:', e);
+      console.error("[SafeLocalStorage] Error reading:", e);
       return null;
     }
   },
@@ -89,16 +73,16 @@ const safeLocalStorage = {
       JSON.parse(value); // Will throw if invalid JSON
       console.debug(`[SafeLocalStorage] Setting ${key}:`, value);
       localStorage.setItem(key, value);
-      
+
       // Verify the value was set correctly
       const storedValue = localStorage.getItem(key);
       if (storedValue !== value) {
-        console.error('[SafeLocalStorage] Verification failed:', { attempted: value, stored: storedValue });
+        console.error("[SafeLocalStorage] Verification failed:", { attempted: value, stored: storedValue });
         return false;
       }
       return true;
     } catch (e) {
-      console.error('[SafeLocalStorage] Error writing:', e);
+      console.error("[SafeLocalStorage] Error writing:", e);
       return false;
     }
   },
@@ -107,23 +91,21 @@ const safeLocalStorage = {
       console.debug(`[SafeLocalStorage] Removing ${key}`);
       localStorage.removeItem(key);
     } catch (e) {
-      console.error('[SafeLocalStorage] Error removing:', e);
+      console.error("[SafeLocalStorage] Error removing:", e);
     }
-  }
+  },
 };
 
 // Validate data structure
 const isValidSelectedItems = (data: unknown): data is Record<string, boolean> => {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    console.debug('[Validation] Invalid data structure:', data);
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    console.debug("[Validation] Invalid data structure:", data);
     return false;
   }
-  
-  const isValid = Object.entries(data).every(
-    ([key, value]) => typeof key === 'string' && typeof value === 'boolean'
-  );
-  
-  console.debug('[Validation] Data validation result:', { isValid, data });
+
+  const isValid = Object.entries(data).every(([key, value]) => typeof key === "string" && typeof value === "boolean");
+
+  console.debug("[Validation] Data validation result:", { isValid, data });
   return isValid;
 };
 
@@ -136,7 +118,7 @@ const safeJSON = {
       JSON.parse(str);
       return str;
     } catch (e) {
-      console.error('[SafeJSON] Stringify error:', e);
+      console.error("[SafeJSON] Stringify error:", e);
       return null;
     }
   },
@@ -144,10 +126,10 @@ const safeJSON = {
     try {
       return JSON.parse(str);
     } catch (e) {
-      console.error('[SafeJSON] Parse error:', e);
+      console.error("[SafeJSON] Parse error:", e);
       return null;
     }
-  }
+  },
 };
 
 // Initialize from localStorage on client-side only
@@ -156,13 +138,13 @@ onMounted(() => {
     try {
       isClient.value = true;
       const stored = safeLocalStorage.getItem(STORAGE_KEY);
-      
+
       if (stored) {
         const parsedData = safeJSON.parse(stored);
         if (parsedData && isValidSelectedItems(parsedData)) {
           selectedItems.value = parsedData;
         } else {
-          console.warn('[Init] Invalid stored data, resetting');
+          console.warn("[Init] Invalid stored data, resetting");
           safeLocalStorage.removeItem(STORAGE_KEY);
           selectedItems.value = {};
         }
@@ -181,26 +163,26 @@ watch(
   selectedItems,
   (newValue) => {
     if (nuxtApp.isHydrating || !isClient.value) {
-      console.debug('[Watch] Skipping update during hydration or non-client state');
+      console.debug("[Watch] Skipping update during hydration or non-client state");
       return;
     }
-    
+
     try {
       if (!isValidSelectedItems(newValue)) {
-        console.error('[Watch] Invalid data structure detected');
+        console.error("[Watch] Invalid data structure detected");
         safeLocalStorage.removeItem(STORAGE_KEY);
         return;
       }
 
       const serializedData = safeJSON.stringify(newValue);
       if (!serializedData) {
-        console.error('[Watch] Failed to serialize data');
+        console.error("[Watch] Failed to serialize data");
         safeLocalStorage.removeItem(STORAGE_KEY);
         return;
       }
 
       if (!safeLocalStorage.setItem(STORAGE_KEY, serializedData)) {
-        console.error('[Watch] Failed to save to localStorage');
+        console.error("[Watch] Failed to save to localStorage");
         safeLocalStorage.removeItem(STORAGE_KEY);
       }
     } catch (error) {
