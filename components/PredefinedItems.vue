@@ -12,7 +12,21 @@
     </div>
 
     <div class="space-y-4">
-      <UInput v-model="searchQuery" color="white" size="md" class="w-full" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" />
+      <UInput v-model="searchQuery" color="white" size="md" class="w-full" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" @input="handleSearch" />
+
+      <!-- Arama Sonuçları -->
+      <div v-if="searchQuery && searchResults.length" class="border rounded-lg p-4 mb-4">
+        <h3 class="text-sm font-medium mb-3">Arama Sonuçları</h3>
+        <div class="space-y-2">
+          <div v-for="item in searchResults" :key="item.id" class="flex items-center justify-between p-2 bg-amber-50 dark:bg-gray-900 rounded-lg">
+            <span class="text-gray-800 dark:text-white text-sm">{{ item.name }}</span>
+            <div class="flex space-x-2">
+              <UButton square color="amber" size="sm" class="tap-button" variant="solid" icon="solar:cart-plus-outline" @click="addItemToShoppingList(item)" />
+              <UButton square color="red" size="sm" class="tap-button" variant="solid" icon="solar:trash-bin-minimalistic-outline" @click="deleteFromPredefinedItems(item)" />
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="sm:hidden">
         <UButton block color="amber" @click="isModalOpen = true" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
@@ -25,12 +39,7 @@
               <template #item="{ item }">
                 <div class="space-y-3 py-2">
                   <div v-for="content in item.content" :key="content.id" class="px-4 flex items-center justify-between py-2 transition-colors rounded-lg">
-                    <span
-                      class="text-gray-800 dark:text-white text-sm sm:text-base"
-                      :class="{
-                        'bg-yellow-100 dark:bg-yellow-800/50': searchQuery && content.name.toLowerCase().includes(searchQuery.toLowerCase()),
-                      }"
-                    >
+                    <span class="text-gray-800 dark:text-white text-sm sm:text-base">
                       {{ content.name }}
                     </span>
                     <div class="flex space-x-2">
@@ -57,7 +66,6 @@ import { usePredefinedItemsStore } from "~/stores/predefinedItemsStore";
 import { useShoppingListItemsStore } from "~/stores/shoppingListItemsStore";
 import { getIconType } from "~/composables/useGetIconType";
 
-const searchQuery = ref("");
 const isModalOpen = ref(false);
 
 // Store
@@ -88,22 +96,27 @@ const processedItems = computed(() => {
     return groups;
   }, {});
 
-  // Filter and format items for accordion
-  return Object.entries(groupedItems)
-    .map(([category, categoryItems]) => {
-      const filteredItems = searchQuery.value ? categoryItems.filter((item) => item.name?.toLowerCase().includes(searchQuery.value.toLowerCase())) : categoryItems;
-
-      if (searchQuery.value && !filteredItems.length) return null;
-
-      return {
-        label: `${category} ${searchQuery.value ? `(${filteredItems.length} sonuç)` : `(${filteredItems.length})`}`,
-        icon: getIconType(category),
-        content: filteredItems,
-        defaultOpen: searchQuery.value ? true : false,
-      };
-    })
-    .filter(Boolean) as { label: string; icon: string; content: PredefinedItem[]; defaultOpen: boolean }[];
+  // Format items for accordion without search filtering
+  return Object.entries(groupedItems).map(([category, categoryItems]) => ({
+    label: `${category} (${categoryItems.length})`,
+    icon: getIconType(category),
+    content: categoryItems,
+  }));
 });
+
+const searchQuery = ref("");
+const searchResults = ref<PredefinedItem[]>([]);
+
+// Arama işlemi
+const handleSearch = () => {
+  if (!searchQuery.value || searchQuery.value.length < 2) {
+    searchResults.value = [];
+    return;
+  }
+
+  const query = searchQuery.value.toLowerCase();
+  searchResults.value = items.value?.filter((item) => item.name?.toLowerCase().includes(query)) || [];
+};
 
 // Action handlers
 const deleteFromPredefinedItems = async (item: PredefinedItem) => {
