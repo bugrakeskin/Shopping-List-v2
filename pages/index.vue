@@ -27,7 +27,7 @@ onMounted(() => {
   // Simüle edilmiş yükleme süresi (isteğe bağlı olarak değiştirilebilir)
   setTimeout(() => {
     isLoading.value = false;
-  }, 500);
+  }, 300);
 });
 </script>
 

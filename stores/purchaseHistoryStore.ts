@@ -1,11 +1,7 @@
 import type { Database } from "~/types/database.types";
 
-type PurchaseHistory = {
-  created_at: string;
-  id: string;
-  item_id: string | null;
-  purchase_date: string | null;
-  item_name?: string | null;
+type PurchaseHistory = Database["public"]["Tables"]["purchase_history"]["Row"] & {
+  predefined_items?: Database["public"]["Tables"]["predefined_items"]["Row"] | null;
 };
 
 export const usePurchaseHistoryStore = defineStore("purchaseHistory", {
@@ -26,7 +22,7 @@ export const usePurchaseHistoryStore = defineStore("purchaseHistory", {
             `
             *,
             predefined_items (
-              name
+              *
             )
           `
           )
@@ -35,15 +31,7 @@ export const usePurchaseHistoryStore = defineStore("purchaseHistory", {
 
         if (error) throw error;
 
-        this.items = Array.isArray(data)
-          ? data.map((item) => ({
-              id: item.id,
-              created_at: item.created_at,
-              item_id: item.item_id,
-              purchase_date: item.purchase_date,
-              item_name: item.predefined_items?.name || null,
-            }))
-          : [];
+        this.items = Array.isArray(data) ? data : [];
 
         const channel = supabase
           .channel("purchase_history_changes")
@@ -62,7 +50,7 @@ export const usePurchaseHistoryStore = defineStore("purchaseHistory", {
                             `
                           *,
                           predefined_items (
-                            name
+                            *
                           )
                         `
                           )
@@ -70,14 +58,7 @@ export const usePurchaseHistoryStore = defineStore("purchaseHistory", {
                           .single();
 
                       if (!fetchError && newItemData) {
-                        const newItem: PurchaseHistory = {
-                          id: newItemData.id,
-                          created_at: newItemData.created_at,
-                          item_id: newItemData.item_id,
-                          purchase_date: newItemData.purchase_date,
-                          item_name: newItemData.predefined_items?.name || null,
-                        };
-                        this.items.unshift(newItem);
+                        this.items.unshift(newItemData);
                       }
                     }
                     break;
@@ -91,7 +72,7 @@ export const usePurchaseHistoryStore = defineStore("purchaseHistory", {
                             `
                           *,
                           predefined_items (
-                            name
+                            *
                           )
                         `
                           )
@@ -100,41 +81,36 @@ export const usePurchaseHistoryStore = defineStore("purchaseHistory", {
 
                       if (!fetchError && updatedItemData) {
                         const index = this.items.findIndex(
-                          (item) => item.id === payload.new.id
+                          (item) => item.id === updatedItemData.id
                         );
-
                         if (index !== -1) {
-                          const updatedItem: PurchaseHistory = {
-                            id: updatedItemData.id,
-                            created_at: updatedItemData.created_at,
-                            item_id: updatedItemData.item_id,
-                            purchase_date: updatedItemData.purchase_date,
-                            item_name:
-                              updatedItemData.predefined_items?.name || null,
-                          };
-                          this.items[index] = updatedItem;
+                          this.items[index] = updatedItemData;
                         }
                       }
                     }
                     break;
 
                   case "DELETE":
-                    if (payload.old?.id) {
-                      this.items = this.items.filter(
-                        (item) => item.id !== payload.old.id
+                    if (payload.old) {
+                      const index = this.items.findIndex(
+                        (item) => item.id === payload.old.id
                       );
+                      if (index !== -1) {
+                        this.items.splice(index, 1);
+                      }
                     }
                     break;
                 }
               } catch (error) {
-                console.error("Real-time update error:", error);
+                console.error("Error handling realtime update:", error);
               }
             }
-          );
+          )
+          .subscribe();
 
-        channel.subscribe((status) => {
-          console.log("Subscription status:", status);
-        });
+        return () => {
+          channel.unsubscribe();
+        };
       } catch (error) {
         console.error("Error fetching purchase history:", error);
       } finally {
