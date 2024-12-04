@@ -1,7 +1,7 @@
 <!-- ShoppingList.vue -->
 <template>
   <div class="gap-1 grid pt-2 px-2">
-    <div class="-ml-2">
+    <div class="-ml-3">
       <div class="flex items-start rounded-md transition duration-500">
         <div class="w-14 p-2 shrink-0">
           <UIcon name="material-symbols-light:select-check-box" class="h-12 w-12 text-amber-500" />
@@ -110,19 +110,19 @@ watch(
   selectedItems,
   (newValue) => {
     if (nuxtApp.isHydrating || !isClient.value) return;
-    
+
     try {
       // Validate data before saving
       const validatedData: Record<string, boolean> = {};
       let hasValidData = false;
-      
+
       for (const [key, value] of Object.entries(newValue)) {
         if (typeof key === "string" && typeof value === "boolean") {
           validatedData[key] = value;
           hasValidData = true;
         }
       }
-      
+
       if (hasValidData) {
         localStorage.setItem("selectedItems", JSON.stringify(validatedData));
       } else {

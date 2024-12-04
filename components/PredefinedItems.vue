@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="py-2 flex justify-end items-center">
+    <div class="py-1 flex justify-end items-center">
       <UButton block square color="amber" @click="isModalOpen = true" variant="solid" size="sm" icon="material-symbols:list-alt-add-outline-rounded"> Ürün Ekle </UButton>
     </div>
 
@@ -23,8 +23,8 @@
         <div v-if="items.length" class="border border-gray dark:border-gray-700 p-2 rounded-xl overflow-auto">
           <UAccordion v-for="(section, idx) in processedItems" :key="idx" color="white" variant="solid" :items="[section]">
             <template #item="{ item }">
-              <div class="space-y-2">
-                <div v-for="content in item.content" :key="content.id" class="pl-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
+              <div class="space-y-2 pl-2">
+                <div v-for="content in item.content" :key="content.id" class="pl-2 flex items-center justify-between rounded-lg">
                   <span
                     class="text-gray-800 dark:text-white font-light"
                     :class="{
@@ -34,8 +34,8 @@
                     {{ content.name }}
                   </span>
                   <div class="flex">
-                    <UButton size="xl" class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1" variant="ghost" icon="solar:cart-plus-outline" @click="addItemToShoppingList(content)" />
-                    <UButton size="xl" class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1" variant="ghost" icon="solar:trash-bin-minimalistic-outline" @click="deleteFromPredefinedItems(content)" />
+                    <UButton square color="amber" size="xl" class="border-0 p-1 mr-2 tap-button" variant="solid" icon="solar:cart-plus-outline" @click="addItemToShoppingList(content)" />
+                    <UButton square color="red" size="xl" class="border-0 p-1 tap-button" variant="solid" icon="solar:trash-bin-minimalistic-outline" @click="deleteFromPredefinedItems(content)" />
                   </div>
                 </div>
               </div>
@@ -149,3 +149,28 @@ const addItemToShoppingList = async (item: PredefinedItem) => {
   }
 };
 </script>
+
+<style scoped>
+.tap-button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.tap-button:active {
+  transform: scale(0.97);
+  animation: wiggle 0.1s ease;
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+</style>
