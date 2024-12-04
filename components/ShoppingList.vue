@@ -68,38 +68,109 @@ const shoppingListItemsStore = useShoppingListItemsStore();
 const { items, loading: isLoading } = storeToRefs(shoppingListItemsStore);
 const nuxtApp = useNuxtApp();
 
+// Constants
+const STORAGE_KEY = "selectedItems";
+
+// Safe localStorage operations with debugging
+const safeLocalStorage = {
+  getItem(key: string): string | null {
+    try {
+      const value = localStorage.getItem(key);
+      console.debug(`[SafeLocalStorage] Getting ${key}:`, value);
+      return value;
+    } catch (e) {
+      console.error('[SafeLocalStorage] Error reading:', e);
+      return null;
+    }
+  },
+  setItem(key: string, value: string): boolean {
+    try {
+      // Validate JSON before setting
+      JSON.parse(value); // Will throw if invalid JSON
+      console.debug(`[SafeLocalStorage] Setting ${key}:`, value);
+      localStorage.setItem(key, value);
+      
+      // Verify the value was set correctly
+      const storedValue = localStorage.getItem(key);
+      if (storedValue !== value) {
+        console.error('[SafeLocalStorage] Verification failed:', { attempted: value, stored: storedValue });
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error('[SafeLocalStorage] Error writing:', e);
+      return false;
+    }
+  },
+  removeItem(key: string): void {
+    try {
+      console.debug(`[SafeLocalStorage] Removing ${key}`);
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.error('[SafeLocalStorage] Error removing:', e);
+    }
+  }
+};
+
+// Validate data structure
+const isValidSelectedItems = (data: unknown): data is Record<string, boolean> => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    console.debug('[Validation] Invalid data structure:', data);
+    return false;
+  }
+  
+  const isValid = Object.entries(data).every(
+    ([key, value]) => typeof key === 'string' && typeof value === 'boolean'
+  );
+  
+  console.debug('[Validation] Data validation result:', { isValid, data });
+  return isValid;
+};
+
+// Safe JSON operations
+const safeJSON = {
+  stringify(data: unknown): string | null {
+    try {
+      const str = JSON.stringify(data);
+      // Verify the result can be parsed back
+      JSON.parse(str);
+      return str;
+    } catch (e) {
+      console.error('[SafeJSON] Stringify error:', e);
+      return null;
+    }
+  },
+  parse(str: string): unknown {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      console.error('[SafeJSON] Parse error:', e);
+      return null;
+    }
+  }
+};
+
 // Initialize from localStorage on client-side only
 onMounted(() => {
   onNuxtReady(async () => {
     try {
       isClient.value = true;
-      const stored = localStorage.getItem("selectedItems");
+      const stored = safeLocalStorage.getItem(STORAGE_KEY);
+      
       if (stored) {
-        try {
-          const parsedData = JSON.parse(stored);
-          if (typeof parsedData === "object" && parsedData !== null && !Array.isArray(parsedData)) {
-            // Validate each item
-            const validatedData: Record<string, boolean> = {};
-            for (const [key, value] of Object.entries(parsedData)) {
-              if (typeof key === "string" && typeof value === "boolean") {
-                validatedData[key] = value;
-              }
-            }
-            selectedItems.value = validatedData;
-          } else {
-            localStorage.removeItem("selectedItems");
-            selectedItems.value = {};
-          }
-        } catch (parseError) {
-          console.error("Error parsing stored data:", parseError);
-          localStorage.removeItem("selectedItems");
+        const parsedData = safeJSON.parse(stored);
+        if (parsedData && isValidSelectedItems(parsedData)) {
+          selectedItems.value = parsedData;
+        } else {
+          console.warn('[Init] Invalid stored data, resetting');
+          safeLocalStorage.removeItem(STORAGE_KEY);
           selectedItems.value = {};
         }
       }
 
       await shoppingListItemsStore.fetchAndSubscribe();
     } catch (err) {
-      console.error("Error initializing shopping list:", err);
+      console.error("[Init] Error:", err);
       error.value = "Failed to initialize shopping list. Please try refreshing the page.";
     }
   });
@@ -109,29 +180,32 @@ onMounted(() => {
 watch(
   selectedItems,
   (newValue) => {
-    if (nuxtApp.isHydrating || !isClient.value) return;
-
+    if (nuxtApp.isHydrating || !isClient.value) {
+      console.debug('[Watch] Skipping update during hydration or non-client state');
+      return;
+    }
+    
     try {
-      // Validate data before saving
-      const validatedData: Record<string, boolean> = {};
-      let hasValidData = false;
-
-      for (const [key, value] of Object.entries(newValue)) {
-        if (typeof key === "string" && typeof value === "boolean") {
-          validatedData[key] = value;
-          hasValidData = true;
-        }
+      if (!isValidSelectedItems(newValue)) {
+        console.error('[Watch] Invalid data structure detected');
+        safeLocalStorage.removeItem(STORAGE_KEY);
+        return;
       }
 
-      if (hasValidData) {
-        localStorage.setItem("selectedItems", JSON.stringify(validatedData));
-      } else {
-        localStorage.removeItem("selectedItems");
+      const serializedData = safeJSON.stringify(newValue);
+      if (!serializedData) {
+        console.error('[Watch] Failed to serialize data');
+        safeLocalStorage.removeItem(STORAGE_KEY);
+        return;
+      }
+
+      if (!safeLocalStorage.setItem(STORAGE_KEY, serializedData)) {
+        console.error('[Watch] Failed to save to localStorage');
+        safeLocalStorage.removeItem(STORAGE_KEY);
       }
     } catch (error) {
-      console.error("Error saving to localStorage:", error);
-      // If there's an error, clear localStorage to prevent invalid data
-      localStorage.removeItem("selectedItems");
+      console.error("[Watch] Error:", error);
+      safeLocalStorage.removeItem(STORAGE_KEY);
     }
   },
   { deep: true }
