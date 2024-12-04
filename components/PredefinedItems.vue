@@ -109,15 +109,19 @@ const deleteFromPredefinedItems = async (item: PredefinedItem) => {
   try {
     await predefinedItemsStore.deleteItem(item.id);
     useToast().add({
-      title: "Başarılı",
+      title: "Bravo!",
       description: "Ürün başarıyla silindi",
       color: "green",
+      icon: "i-heroicons-check-circle",
+      timeout: 3000,
     });
   } catch (error) {
     useToast().add({
-      title: "Hata",
+      title: "Maalesef!",
       description: "Ürün silinirken bir hata oluştu",
       color: "red",
+      icon: "i-heroicons-exclamation-triangle",
+      timeout: 3000,
     });
     console.error("Failed to delete item:", error);
   }
@@ -127,15 +131,19 @@ const addItemToShoppingList = async (item: PredefinedItem) => {
   try {
     await shoppingListStore.addItemToShoppingList(item);
     useToast().add({
-      title: "Başarılı",
+      title: "Bravo!",
       description: "Ürün alışveriş listenize eklendi.",
       color: "green",
+      icon: "i-heroicons-check-circle",
+      timeout: 3000,
     });
   } catch (error) {
     useToast().add({
-      title: "Hata",
-      description: "Ürün eklenirken bir hata oluştu",
-      color: "red",
+      title: "Selam",
+      description: "Ürün zaten alışveriş listenizde bulunuyor.",
+      color: "yellow",
+      icon: "i-heroicons-exclamation-triangle",
+      timeout: 3000,
     });
     console.error("Failed to add item to shopping list:", error);
   }
