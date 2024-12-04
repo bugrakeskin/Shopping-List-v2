@@ -30,7 +30,22 @@
           </UFormGroup>
 
           <UFormGroup label="Ürün Tipi" name="category">
-            <USelectMenu placeholder="Ürün Tipini Seçin" v-model="formState.category" :options="['Gıda', 'Temizlik', 'Kişisel Bakım', 'İçecek']" />
+            <USelectMenu 
+              placeholder="Ürün Tipini Seçin" 
+              v-model="formState.category" 
+              :options="[
+                'Gıda', 
+                'Temizlik', 
+                'Kişisel Bakım', 
+                'İçecek', 
+                'Meyve & Sebze', 
+                'Kahvaltılık', 
+                'Et & Tavuk', 
+                'Süt & Süt Ürünleri', 
+                'Atıştırmalık', 
+                'Ev Bakım'
+              ]" 
+            />
           </UFormGroup>
 
           <UButton variant="solid" color="amber" size="md" block type="submit" :loading="loading">Kaydet</UButton>

@@ -1,13 +1,25 @@
 export function getIconType(productIconType: string): string {
   if (productIconType === "Gıda") {
-    return "fluent:food-48-regular";
+    return "la:utensils";
   } else if (productIconType === "Temizlik") {
-    return "carbon:clean";
+    return "ri:hand-sanitizer-line";
   } else if (productIconType === "Kişisel Bakım") {
-    return "covid:personal-hygiene-hand-sanitizer-liquid-1";
+    return "ph:shower-thin";
   } else if (productIconType === "İçecek") {
-    return "carbon:drink-01";
+    return "la:glass-whiskey";
+  } else if (productIconType === "Meyve & Sebze") {
+    return "la:apple-alt";
+  } else if (productIconType === "Kahvaltılık") {
+    return "la:bread-slice";
+  } else if (productIconType === "Et & Tavuk") {
+    return "la:drumstick-bite";
+  } else if (productIconType === "Süt & Süt Ürünleri") {
+    return "la:wine-bottle";
+  } else if (productIconType === "Atıştırmalık") {
+    return "la:cookie";
+  } else if (productIconType === "Ev Bakım") {
+    return "la:broom";
   } else {
-    return "i-heroicons-arrow-down-tray";
+    return "la:shopping-cart";
   }
 }

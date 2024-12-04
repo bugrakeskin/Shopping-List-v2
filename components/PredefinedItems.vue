@@ -15,7 +15,7 @@
       <UInput v-model="searchQuery" color="white" size="md" class="w-full" variant="outline" placeholder="Ürün ara..." icon="i-heroicons-magnifying-glass-20-solid" @input="handleSearch" />
 
       <!-- Arama Sonuçları -->
-      <div v-if="searchQuery && searchResults.length" class="border rounded-lg p-4 mb-4">
+      <div v-if="searchQuery && searchResults.length" class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
         <h3 class="text-sm font-medium mb-3">Arama Sonuçları</h3>
         <div class="space-y-2">
           <div v-for="item in searchResults" :key="item.id" class="flex items-center justify-between p-2 bg-amber-50 dark:bg-gray-900 rounded-lg">
