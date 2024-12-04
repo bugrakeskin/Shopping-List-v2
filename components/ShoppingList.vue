@@ -1,13 +1,6 @@
 <!-- ShoppingList.vue -->
 <template>
   <div class="gap-1 grid pt-2 px-2">
-    <!--  <div>
-      <span class="inline-flex items-baseline">
-        <UIcon name="material-symbols:check-box-outline" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
-        <span class="text-xl font-thin">Liste</span>
-      </span>
-    </div> -->
-
     <div class="-ml-2">
       <div class="flex items-start rounded-md transition duration-500">
         <div class="w-14 p-2 shrink-0">

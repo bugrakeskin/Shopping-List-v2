@@ -20,22 +20,22 @@
 
     <ClientOnly>
       <div v-if="!isLoading && items">
-        <div v-if="items.length" class="border border-gray dark:border-gray-700 font-light p-2 rounded-xl overflow-auto">
-          <UAccordion v-for="(section, idx) in processedItems" :key="idx" color="gray" variant="ghost" :items="[section]">
+        <div v-if="items.length" class="border border-gray dark:border-gray-700 p-2 rounded-xl overflow-auto">
+          <UAccordion v-for="(section, idx) in processedItems" :key="idx" color="white" variant="solid" :items="[section]">
             <template #item="{ item }">
               <div class="space-y-2">
                 <div v-for="content in item.content" :key="content.id" class="pl-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
                   <span
-                    class="leading-none text-md md:text-md"
+                    class="text-gray-800 dark:text-white font-light"
                     :class="{
-                      'bg-yellow-100 dark:bg-yellow-800/50': searchQuery && content.name.toLowerCase().includes(searchQuery.toLowerCase()),
+                      'bg-yellow-100 dark:bg-yellow-800/50 ': searchQuery && content.name.toLowerCase().includes(searchQuery.toLowerCase()),
                     }"
                   >
                     {{ content.name }}
                   </span>
                   <div class="flex">
-                    <UButton size="xl" class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1" variant="soft" icon="solar:cart-plus-outline" @click="addItemToShoppingList(content)" />
-                    <UButton size="xl" class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1" variant="soft" icon="solar:trash-bin-minimalistic-outline" @click="deleteFromPredefinedItems(content)" />
+                    <UButton size="xl" class="text-green-700 dark:text-green-300 bg-transparent dark:bg-transparent border-0 p-1" variant="ghost" icon="solar:cart-plus-outline" @click="addItemToShoppingList(content)" />
+                    <UButton size="xl" class="text-red-500 dark:text-red-300 bg-transparent dark:bg-transparent border-0 p-1" variant="ghost" icon="solar:trash-bin-minimalistic-outline" @click="deleteFromPredefinedItems(content)" />
                   </div>
                 </div>
               </div>
