@@ -1,6 +1,6 @@
 <!-- ShoppingList.vue -->
 <template>
-  <div class="gap-1 grid py-4 px-2">
+  <div class="gap-1 grid pt-2 px-2">
     <!--  <div>
       <span class="inline-flex items-baseline">
         <UIcon name="material-symbols:check-box-outline" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
@@ -27,7 +27,7 @@
 
     <!-- Items Loaded State -->
     <ClientOnly>
-      <div v-if="items && items.length > 0" class="max-h-[35vh] border border-gray dark:border-gray-700 font-light p-1 rounded-xl overflow-auto">
+      <div v-if="items && items.length > 0" class="max-h-[32vh] border border-gray dark:border-gray-700 font-light p-1 rounded-xl overflow-auto">
         <!-- show items list -->
         <div v-for="item in items" :key="item.id" class="pl-2 py-1 flex items-center justify-between cursor-pointer">
           <div class="flex items-center gap-2">
