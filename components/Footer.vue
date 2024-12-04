@@ -1,10 +1,13 @@
 <template>
-  <div class="container max-w-xl mx-auto flex items-center justify-between dark:text-gray-500 text-xs text-gray-400 py-4 px-6">
+  <div class="w-full flex items-center justify-between dark:text-gray-500 text-xs text-gray-400 py-4">
     <div>
-      <span>&copy; 2024 BK - {{ getVersion() }}</span>
+      <span>&copy; 2024 BK</span>
+    </div>
+    <div class="text-center">
+      <span>v.{{ getVersion() }}</span>
     </div>
     <div>
-      <span>Powered by 🤍 MS</span>
+      <span>Powered by MS</span>
     </div>
   </div>
 </template>
