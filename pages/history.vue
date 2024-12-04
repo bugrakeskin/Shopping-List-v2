@@ -20,7 +20,7 @@
 
     <div v-else-if="purchaseHistoryStore.items.length === 0" class="text-center py-8 text-gray-500">Henüz geçmiş kayıt bulunmuyor</div>
 
-    <div v-else class="grid gap-4 max-h-[calc(100vh-10rem)] overflow-auto p-2">
+    <div v-else class="grid gap-4 max-h-[calc(100vh-12rem)] overflow-auto p-2">
       <!-- <div>
 				<span class="inline-flex items-baseline mb-2">
 					<UIcon name="ic:round-history" class="self-center w-6 h-6 rounded-full mr-1 text-green-600 dark:text-green-600" />
