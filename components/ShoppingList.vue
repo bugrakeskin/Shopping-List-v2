@@ -66,18 +66,19 @@ const isClient = ref(false);
 // Store
 const shoppingListItemsStore = useShoppingListItemsStore();
 const { items, loading: isLoading } = storeToRefs(shoppingListItemsStore);
+const nuxtApp = useNuxtApp();
 
 // Initialize from localStorage on client-side only
-onMounted(async () => {
-  isClient.value = true;
-  try {
-    if (process.client) {
-      try {
-        const stored = localStorage.getItem("selectedItems");
-        if (stored) {
+onMounted(() => {
+  onNuxtReady(async () => {
+    try {
+      isClient.value = true;
+      const stored = localStorage.getItem("selectedItems");
+      if (stored) {
+        try {
           const parsedData = JSON.parse(stored);
           if (typeof parsedData === "object" && parsedData !== null && !Array.isArray(parsedData)) {
-            // Her bir öğeyi doğrula
+            // Validate each item
             const validatedData: Record<string, boolean> = {};
             for (const [key, value] of Object.entries(parsedData)) {
               if (typeof key === "string" && typeof value === "boolean") {
@@ -89,38 +90,48 @@ onMounted(async () => {
             localStorage.removeItem("selectedItems");
             selectedItems.value = {};
           }
+        } catch (parseError) {
+          console.error("Error parsing stored data:", parseError);
+          localStorage.removeItem("selectedItems");
+          selectedItems.value = {};
         }
-      } catch (parseError) {
-        console.error("Error parsing stored data:", parseError);
-        localStorage.removeItem("selectedItems");
-        selectedItems.value = {};
       }
-    }
 
-    await shoppingListItemsStore.fetchAndSubscribe();
-  } catch (err) {
-    console.error("Error initializing shopping list:", err);
-    error.value = "Failed to initialize shopping list. Please try refreshing the page.";
-  }
+      await shoppingListItemsStore.fetchAndSubscribe();
+    } catch (err) {
+      console.error("Error initializing shopping list:", err);
+      error.value = "Failed to initialize shopping list. Please try refreshing the page.";
+    }
+  });
 });
 
 // Watch selectedItems changes and update localStorage
 watch(
   selectedItems,
   (newValue) => {
-    if (process.client && isClient.value) {
-      try {
-        // Veriyi doğrula ve sadece geçerli değerleri kaydet
-        const validatedData: Record<string, boolean> = {};
-        for (const [key, value] of Object.entries(newValue)) {
-          if (typeof key === "string" && typeof value === "boolean") {
-            validatedData[key] = value;
-          }
+    if (nuxtApp.isHydrating || !isClient.value) return;
+    
+    try {
+      // Validate data before saving
+      const validatedData: Record<string, boolean> = {};
+      let hasValidData = false;
+      
+      for (const [key, value] of Object.entries(newValue)) {
+        if (typeof key === "string" && typeof value === "boolean") {
+          validatedData[key] = value;
+          hasValidData = true;
         }
-        localStorage.setItem("selectedItems", JSON.stringify(validatedData));
-      } catch (error) {
-        console.error("Error saving to localStorage:", error);
       }
+      
+      if (hasValidData) {
+        localStorage.setItem("selectedItems", JSON.stringify(validatedData));
+      } else {
+        localStorage.removeItem("selectedItems");
+      }
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+      // If there's an error, clear localStorage to prevent invalid data
+      localStorage.removeItem("selectedItems");
     }
   },
   { deep: true }
